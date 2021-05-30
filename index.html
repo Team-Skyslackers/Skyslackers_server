@@ -53,9 +53,12 @@
                         var fd = Math.trunc(frontToBack_degrees);
                         var ld = Math.trunc(leftToRight_degrees);
                         //ws.send("rd is " + rd.toString() + ", " + "fd is " + fd.toString() + ", " + "ld is " + ld.toString());
-                        ws.send('alpha = '+rotation_degrees+'\n');
-                        ws.send('beta = '+frontToBack_degrees+'\n');
-                        ws.send('gamma = '+leftToRight_degrees+'\n');
+
+                        // ws.send('alpha = '+rotation_degrees);
+                        ws.send(event.alpha + " " + event.beta + " " + event.gamma);
+                        // ws.send('gamma = '+leftToRight_degrees);
+
+
                         // Update velocity according to how tilted the phone is
                         // Since phones are narrower than they are long, double the increase to the x velocity
                         /*
