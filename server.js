@@ -5,9 +5,22 @@ var app = express()
 // readFileSync function must use __dirname get current directory
 // require use ./ refer to current directory.
 
+var local_IP_address = "";
+var interfaces = require("os").networkInterfaces();
+for (var k in interfaces) {
+  for (var i in interfaces[k]) {
+    if (
+      interfaces[k][i].family == "IPv4" &&
+      interfaces[k][i].address != "127.0.0.1"
+    ) {
+      local_IP_address = interfaces[k][i].address;
+    }
+  }
+}
+
 const certs = {
-   key: fs.readFileSync(__dirname + '/192.168.3.48-key.pem', 'utf8'),
-  cert: fs.readFileSync(__dirname + '/192.168.3.48.pem', 'utf8')
+   key: fs.readFileSync(__dirname + '/' + local_IP_address + '-key.pem', 'utf8'),
+  cert: fs.readFileSync(__dirname + '/' + local_IP_address + '.pem', 'utf8')
 };
 
 

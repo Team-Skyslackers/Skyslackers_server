@@ -22,7 +22,7 @@
             console.log("We are connected");
         })
         */
-    var ws = new WebSocket('wss://192.168.3.48:8000');
+    var ws = new WebSocket('wss://' + window.location.hostname + ':8000');
     // event emmited when connected
     ws.onopen = function () {
         console.log('websocket is connected ...')
