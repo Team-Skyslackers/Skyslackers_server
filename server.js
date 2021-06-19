@@ -1,6 +1,7 @@
 const https = require('https');
 const fs = require('fs');
-var express = require('express')
+var QRCode = require('qrcode');
+var express = require('express');
 var app = express()
 // readFileSync function must use __dirname get current directory
 // require use ./ refer to current directory.
@@ -29,6 +30,11 @@ const certs = {
   console.log("server running at https://" + local_IP_address.split('.')[0]+ '-'
   + local_IP_address.split('.')[1] + '-' + local_IP_address.split('.')[2] + '-' 
   + local_IP_address.split('.')[3] + ".xip.lhjmmc.cn:" + "8000/")
+  QRCode.toString("https://" + local_IP_address.split('.')[0]+ '-'
+  + local_IP_address.split('.')[1] + '-' + local_IP_address.split('.')[2] + '-' 
+  + local_IP_address.split('.')[3] + ".xip.lhjmmc.cn:" + "8000/",{type:'terminal'}, function (err, url) {
+    console.log(url)
+  })
 });
 app.get('/', function (req, res) {
   res.sendFile(__dirname + '/index.html');
