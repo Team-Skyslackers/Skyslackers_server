@@ -19,14 +19,16 @@ for (var k in interfaces) {
 }
 
 const certs = {
-   key: fs.readFileSync(__dirname + '/' + local_IP_address + '-key.pem', 'utf8'),
-  cert: fs.readFileSync(__dirname + '/' + local_IP_address + '.pem', 'utf8')
+   key: fs.readFileSync(__dirname + "/key.pem", 'utf8'),
+  cert: fs.readFileSync(__dirname + "/cert.pem", 'utf8')
 };
 
 
  // Create HTTPs server.
  var httpsServer = https.createServer(certs, app).listen(8000, function () {
-  console.log("server running at https://IP_ADDRESS:8000/")
+  console.log("server running at https://" + local_IP_address.split('.')[0]+ '-'
+  + local_IP_address.split('.')[1] + '-' + local_IP_address.split('.')[2] + '-' 
+  + local_IP_address.split('.')[3] + ".xip.lhjmmc.cn:" + "8000/")
 });
 app.get('/', function (req, res) {
   res.sendFile(__dirname + '/index.html');
