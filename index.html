@@ -27,7 +27,7 @@
     ws.onopen = function () {
         console.log('websocket is connected ...')
         // sending a send event to websocket server
-        ws.send('connectedyayyy')
+        // ws.send('connectedyayyy')
     }
     // event emmited when receiving message 
     ws.onmessage = function (ev) {
@@ -40,6 +40,7 @@
         var updateRate = 1/60; // Sensor refresh rate
 
         function getAccel(){
+            ws.send('g'); // permission granted;
             DeviceMotionEvent.requestPermission().then(response => {
                 if (response == 'granted') {
             // Add a listener to get smartphone orientation 

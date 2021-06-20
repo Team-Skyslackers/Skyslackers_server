@@ -44,9 +44,15 @@ var rd = "0 0 0";
 var WebSocketServer = require('ws').Server,
   wss = new WebSocketServer({server: httpsServer})
 wss.on('connection', function (ws) {
+  console.log('controller connected');
   ws.on('message', function (message) {
-    console.log('received: %s', message);
-    rd = message;
+    // console.log('received: %s', message);
+    if (message == 'g') {
+      console.log('gyro info received');
+    }else{
+      rd = message;
+    }
+    
   })
   setInterval(
     () => ws.send(`${new Date()}`),
@@ -62,8 +68,12 @@ wss_Unity.on('listening',()=>{
    console.log('Unity server listening on 8080')
 })
 wss_Unity.on('connection', function connection(ws_Unity) {
+  console.log('Unity connected');
   setInterval(
-    () => {ws_Unity.send(rd); console.log('data sent to Unity: %s', rd);},
-    17
+    () => {
+      ws_Unity.send(rd); 
+      // console.log('data sent to Unity: %s', rd);
+    },
+    17 // 60Hz refresh rate == about 17ms between each update
   )
 })
