@@ -25,7 +25,9 @@
     var ws = new WebSocket('wss://' + window.location.hostname + ':8000');
     // event emmited when connected
     ws.onopen = function () {
-        console.log('websocket is connected ...')
+        console.log('websocket is connected ...');
+        // window.navigator.vibrate(200);
+        // console.log(window.navigator.vibrate);
         // sending a send event to websocket server
         // ws.send('connectedyayyy')
     }
