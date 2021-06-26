@@ -51,6 +51,7 @@ wss.on('connection', function (ws) {
       console.log('gyro info received');
     }else{
       rd = message;
+    // console.log(rd);
     }
     
   })

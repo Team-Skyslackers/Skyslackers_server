@@ -42,9 +42,53 @@
         var updateRate = 1/60; // Sensor refresh rate
 
         function getAccel(){
-            ws.send('g'); // permission granted;
+            // ws.send('g'); // permission granted;
+            // document.getElementById("debug").innerHTML = "Hello";
+            window.addEventListener('deviceorientation',(event) => {
+
+                // Expose each orientation angle in a more readable way
+                rotation_degrees = event.alpha;
+                frontToBack_degrees = event.beta;
+                leftToRight_degrees = event.gamma;
+                var rd = Math.trunc(rotation_degrees);
+                var fd = Math.trunc(frontToBack_degrees);
+                var ld = Math.trunc(leftToRight_degrees);
+                //ws.send("rd is " + rd.toString() + ", " + "fd is " + fd.toString() + ", " + "ld is " + ld.toString());
+
+                // ws.send('alpha = '+rotation_degrees);
+                ws.send(event.alpha + " " + event.beta + " " + event.gamma);
+                // ws.send('gamma = '+leftToRight_degrees);
+
+
+                // Update velocity according to how tilted the phone is
+                // Since phones are narrower than they are long, double the increase to the x velocity
+                /*
+                vx = vx + leftToRight_degrees * updateRate*2; 
+                vy = vy + frontToBack_degrees * updateRate;
+                
+                // Update position and clip it to bounds
+                px = px + vx*.5;
+                if (px > 98 || px < 0){ 
+                    px = Math.max(0, Math.min(98, px)) // Clip px between 0-98
+                    vx = 0;
+                }
+
+                py = py + vy*.5;
+                if (py > 98 || py < 0){
+                    py = Math.max(0, Math.min(98, py)) // Clip py between 0-98
+                    vy = 0;
+                }
+                
+                dot = document.getElementsByClassName("indicatorDot")[0]
+                dot.setAttribute('style', "left:" + (px) + "%;" +
+                                            "top:" + (py) + "%;");
+                */
+            })
+            
             DeviceMotionEvent.requestPermission().then(response => {
+                // document.getElementById("debug").innerHTML = "Hello";
                 if (response == 'granted') {
+                    ws.send('g'); 
             // Add a listener to get smartphone orientation 
                 // in the alpha-beta-gamma axes (units in degrees)
                     window.addEventListener('deviceorientation',(event) => {
@@ -94,5 +138,7 @@
     <body style="background-color:rgb(255, 255, 255);">
         <button id="accelPermsButton"  style="height:50px;" onclick="getAccel()"><h1>Get Accelerometer Permissions</h1></button>
        <!-- <div class="indicatorDot" style="left:30%; top:30%;"></div> -->
+       <p id="debug"> </p>
     </body>
+    
 </html>
