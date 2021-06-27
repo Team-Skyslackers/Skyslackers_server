@@ -1,5 +1,6 @@
 const https = require('https');
 const fs = require('fs');
+const applescript = require('applescript');
 var QRCode = require('qrcode');
 var express = require('express');
 var app = express()
@@ -49,6 +50,8 @@ wss.on('connection', function (ws) {
     // console.log('received: %s', message);
     if (message == 'g') {
       console.log('gyro info received');
+      const script = 'tell application "game" to activate';
+      applescript.execString(script);
     }else{
       rd = message;
     // console.log(rd);
