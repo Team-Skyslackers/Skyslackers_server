@@ -51,7 +51,7 @@ wss.on('connection', function (ws) {
     // console.log('received: %s', message);
     if (message == 'g') {
       console.log('gyro info received');
-      const script = 'tell application "Skyslacker" to activate';
+      const script = 'tell application "Skyslackers" to activate';
       applescript.execString(script);
     }else{
       rd = message;
