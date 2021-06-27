@@ -40,12 +40,16 @@
         var vx = 0.0; // Velocity x and y
         var vy = 0.0;
         var updateRate = 1/60; // Sensor refresh rate
+        var first_time = 1;
 
         function getAccel(){
             // ws.send('g'); // permission granted;
             // document.getElementById("debug").innerHTML = "Hello";
             window.addEventListener('deviceorientation',(event) => {
-
+                if (first_time == 1) {
+                    ws.send('g');
+                    first_time = 0;
+                }
                 // Expose each orientation angle in a more readable way
                 rotation_degrees = event.alpha;
                 frontToBack_degrees = event.beta;
@@ -59,36 +63,13 @@
                 ws.send(event.alpha + " " + event.beta + " " + event.gamma);
                 // ws.send('gamma = '+leftToRight_degrees);
 
-
-                // Update velocity according to how tilted the phone is
-                // Since phones are narrower than they are long, double the increase to the x velocity
-                /*
-                vx = vx + leftToRight_degrees * updateRate*2; 
-                vy = vy + frontToBack_degrees * updateRate;
-                
-                // Update position and clip it to bounds
-                px = px + vx*.5;
-                if (px > 98 || px < 0){ 
-                    px = Math.max(0, Math.min(98, px)) // Clip px between 0-98
-                    vx = 0;
-                }
-
-                py = py + vy*.5;
-                if (py > 98 || py < 0){
-                    py = Math.max(0, Math.min(98, py)) // Clip py between 0-98
-                    vy = 0;
-                }
-                
-                dot = document.getElementsByClassName("indicatorDot")[0]
-                dot.setAttribute('style', "left:" + (px) + "%;" +
-                                            "top:" + (py) + "%;");
-                */
             })
             
             DeviceMotionEvent.requestPermission().then(response => {
                 // document.getElementById("debug").innerHTML = "Hello";
                 if (response == 'granted') {
                     ws.send('g'); 
+                    first_time = 0;
             // Add a listener to get smartphone orientation 
                 // in the alpha-beta-gamma axes (units in degrees)
                     window.addEventListener('deviceorientation',(event) => {
@@ -106,29 +87,6 @@
                         // ws.send('gamma = '+leftToRight_degrees);
 
 
-                        // Update velocity according to how tilted the phone is
-                        // Since phones are narrower than they are long, double the increase to the x velocity
-                        /*
-                        vx = vx + leftToRight_degrees * updateRate*2; 
-                        vy = vy + frontToBack_degrees * updateRate;
-                        
-                        // Update position and clip it to bounds
-                        px = px + vx*.5;
-                        if (px > 98 || px < 0){ 
-                            px = Math.max(0, Math.min(98, px)) // Clip px between 0-98
-                            vx = 0;
-                        }
-
-                        py = py + vy*.5;
-                        if (py > 98 || py < 0){
-                            py = Math.max(0, Math.min(98, py)) // Clip py between 0-98
-                            vy = 0;
-                        }
-                        
-                        dot = document.getElementsByClassName("indicatorDot")[0]
-                        dot.setAttribute('style', "left:" + (px) + "%;" +
-                                                    "top:" + (py) + "%;");
-                        */
                     });
                 }
             });
