@@ -10,7 +10,7 @@ For repository of our server, please go to https://github.com/yuejunfeng0909/Sky
 **Mac**
 1. Unzip the compressed zip file. Open the folder.
 2. Right-click on "skyslackers_server_mac" and select "Open". First-time users may need to go to system preferences - security & privacy - general to allow the computer to open the executable.
-3. Use your phone to scan the QR code and open the webpage in the browser, preferably Safari or Chrome.
+3. Use your phone to scan the QR code and open the webpage in the browser, preferably Safari or Chrome. Make sure that your phone is in the same Wifi with your computer.
 4. Tap "Get Accelerometer Permission" and select "Allow".
 5. Wait until the game is opened. If the system says the game cannot be trusted, right-click on "Skyslackers" in the same directory and select "Open", and select "Open" to trust the game.
 6. Click “Start” and select a song from song1, song2 and song3 (listed in increasing difficulty).
@@ -20,7 +20,7 @@ For repository of our server, please go to https://github.com/yuejunfeng0909/Sky
 **Windows**
 1. Unzip the compressed zip file. Open the folder.
 2. Right-click on “skyslackers_server_win” and select “Open”. First-time users may need to adjust windows firewall settings in the pop-up window: make sure the “public” box is ticked, or the server may fail to operate.
-3. Use your phone to scan the QR code and open the webpage in the browser, preferably Safari or Chrome.
+3. Use your phone to scan the QR code and open the webpage in the browser, preferably Safari or Chrome. Make sure that your phone is in the same Wifi with your computer.
 4. Tap "Get Accelerometer Permission" and select "Allow".
 5. Wait until the game is opened. 
 6. Click “Start” and select a song from song1, song2 and song3 (listed in increasing difficulty).
