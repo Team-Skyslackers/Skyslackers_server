@@ -5,6 +5,7 @@ var QRCode = require('qrcode');
 var express = require('express');
 var app = express()
 
+app.use(express.static(__dirname));
 // readFileSync function must use __dirname get current directory
 // require use ./ refer to current directory.
 

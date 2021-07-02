@@ -4,6 +4,8 @@ const applescript = require('applescript');
 var QRCode = require('qrcode');
 var express = require('express');
 var app = express()
+
+app.use(express.static(__dirname));
 // readFileSync function must use __dirname get current directory
 // require use ./ refer to current directory.
 
@@ -65,7 +67,8 @@ wss.on('connection', function (ws) {
   )
 })
 
-const ws_Unity = require('ws')
+const ws_Unity = require('ws');
+const { allowedNodeEnvironmentFlags } = require('process');
 const wss_Unity = new ws_Unity.Server({ port: 8080 },()=>{
     console.log('server started')
 })
