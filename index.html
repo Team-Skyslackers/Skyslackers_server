@@ -6,86 +6,162 @@
         <title>Motion Controller</title>
 
         <style>
-        .imgbox {
-            display: grid;
-            height: 100%;
-        }
-        .center-fit {
-            max-width: 100%;
-            max-height: 100vh;
-            margin: auto;
-        }
-        .button {
-            border: none;
-            color: white;
-            padding: 60px 16px;
-            width: 100%;
-            text-align: center;
-            text-decoration: none;
-            display: block;
-            font-size: 36px;
-            margin: auto;
-            background-color: #008CBA;
-        }
+            .imgbox {
+                display: grid;
+                height: 100%;
+            }
+            .center-fit {
+                max-width: 80%;
+                max-height: 100vh;
+                padding-top: 5%;
+                padding-bottom: 5%;
+                margin: auto;
+            }
+            .button {
+                border: none;
+                color: white;
+                padding: 60px 16px;
+                width: 100%;
+                text-align: center;
+                text-decoration: none;
+                display: block;
+                font-size: 36px;
+                margin: auto;
+                background-color: #008CBA;
+            }
         </style>
 
-    <script>
-    var ws = new WebSocket('wss://' + window.location.hostname + ':8000');
-    // event emmited when connected
-    ws.onopen = function () {
-        console.log('websocket is connected ...');
-        // window.navigator.vibrate(200);
-        // console.log(window.navigator.vibrate);
-        // sending a send event to websocket server
-        // ws.send('connectedyayyy')
-    }
-    // event emmited when receiving message 
-    ws.onmessage = function (ev) {
-        console.log(ev);
-    }
-        var px = 50; // Position x and y
-        var py = 50;
-        var vx = 0.0; // Velocity x and y
-        var vy = 0.0;
-        var updateRate = 1/60; // Sensor refresh rate
-        var first_time = 1;
+        <!-- jQuery CDN minified-->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 
-        function getAccel(){
-            DeviceMotionEvent.requestPermission().then(response => {
-                // document.getElementById("debug").innerHTML = "Hello";
-                if (response == 'granted') {
-                    ws.send('g'); 
-                    first_time = 0;
-                    // Add a listener to get smartphone orientation
-                    // in the alpha-beta-gamma axes (units in degrees)
-                    window.addEventListener('deviceorientation',(event) => {
-                        // Expose each orientation angle in a more readable way
-                        rotation_degrees = event.alpha;
-                        frontToBack_degrees = event.beta;
-                        leftToRight_degrees = event.gamma;
-                        var rd = Math.trunc(rotation_degrees);
-                        var fd = Math.trunc(frontToBack_degrees);
-                        var ld = Math.trunc(leftToRight_degrees);
-                        //ws.send("rd is " + rd.toString() + ", " + "fd is " + fd.toString() + ", " + "ld is " + ld.toString());
+        <!-- BootStrap CDN-->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
+        
+        <!-- Firebase CDN-->
+        <!-- The core Firebase JS SDK is always required and must be listed first -->
+        <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-auth.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-firestore.js"></script>
 
-                        // ws.send('alpha = '+rotation_degrees);
-                        ws.send(event.alpha + " " + event.beta + " " + event.gamma);
-                        // ws.send('gamma = '+leftToRight_degrees);
+        <!-- TODO: Add SDKs for Firebase products that you want to use
+            https://firebase.google.com/docs/web/setup#available-libraries -->
 
+        <script>
+        // Your web app's Firebase configuration
+        var firebaseConfig = {
+            apiKey: "AIzaSyC4gdo6gFSc_W90EBkoMNieCRqttQZ2zWw",
+            authDomain: "test-7f7c0.firebaseapp.com",
+            projectId: "test-7f7c0",
+            storageBucket: "test-7f7c0.appspot.com",
+            messagingSenderId: "531047203297",
+            appId: "1:531047203297:web:e005e20157956859bb12a0"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        </script>
 
-                    });
-                }
-            });
+        <!-- Websocket connection -->
+        <script>
+        var ws = new WebSocket('wss://' + window.location.hostname + ':8000');
+        // event emmited when connected
+        ws.onopen = function () {
+            console.log('websocket is connected ...');
+            // window.navigator.vibrate(200);
+            // console.log(window.navigator.vibrate);
+            // sending a send event to websocket server
+            // ws.send('connectedyayyy')
         }
-    </script>
+        // event emmited when receiving message 
+        ws.onmessage = function (ev) {
+            console.log(ev);
+        }
+            function getAccel(){
+                DeviceMotionEvent.requestPermission().then(response => {
+                    // document.getElementById("debug").innerHTML = "Hello";
+                    if (response == 'granted') {
+                        ws.send('g'); 
+                        // Add a listener to get smartphone orientation
+                        // in the alpha-beta-gamma axes (units in degrees)
+                        window.addEventListener('deviceorientation',(event) => {
+                            // Expose each orientation angle in a more readable way
+                            rotation_degrees = event.alpha;
+                            frontToBack_degrees = event.beta;
+                            leftToRight_degrees = event.gamma;
+                            var rd = Math.trunc(rotation_degrees);
+                            var fd = Math.trunc(frontToBack_degrees);
+                            var ld = Math.trunc(leftToRight_degrees);
+                            //ws.send("rd is " + rd.toString() + ", " + "fd is " + fd.toString() + ", " + "ld is " + ld.toString());
+
+                            // ws.send('alpha = '+rotation_degrees);
+                            ws.send(event.alpha + " " + event.beta + " " + event.gamma);
+                        });
+                    }
+                });
+            }
+        </script>
     </head>
-    <body style="background-color:rgb(255, 255, 255);">
+    <body>
         <div class="imgbox">
             <img src="LOGO.jpg" alt="LOGO" class="center-fit">
         </div>
+
+        <div class="container" id="login-form">
+            <div class="card card-body"><form>
+                <div class="mb-3">
+                  <label for="inputEmail" class="form-label">Email address</label>
+                  <input type="email" class="form-control" id="inputEmail" aria-describedby="emailHelp">
+                  <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+                </div>
+                <div class="mb-3">
+                  <label for="inputPassword" class="form-label">Password</label>
+                  <input type="password" class="form-control" id="inputPassword">
+                </div>
+                <!-- <div class="mb-3 form-check">
+                  <input type="checkbox" class="form-check-input" id="exampleCheck1">
+                  <label class="form-check-label" for="exampleCheck1">Check me out</label>
+                </div> -->
+                <div class="d-grid gap-2">
+                    <button type="button" id="signin-button" class="btn btn-primary">Sign in</button>
+                    <button type="button" id="register-button" class="btn btn-warning">Create new account</button>
+                    <button type="button" id="google-login-button" class="btn btn-info">Login with Google</button>
+                  </div>
+              </form>
+            </div>
+        </div>
+
+        <!-- Register function -->
+        <script>
+        $("#register-button").click(function(){
+            var email = $("#inputEmail").val();
+            var password = $("#inputPassword").val();
+            RegisterUser(email, password);
+        })
+
+
+        function RegisterUser(email, password){
+            firebase.auth().createUserWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    // Signed in 
+                    var user = userCredential.user;
+
+                    console.log("Successfully registered new user");
+                })
+                .catch((error) => {
+                    var errorCode = error.code;
+                    var errorMessage = error.message;
+
+                    console.log(errorMessage);
+                });
+        }
+        </script>
+
         <!-- <h1>Motion Controller</h1> -->
+        <p></p>
         <p>Point your phone towards the computer screen and tap on the button below:</p>
-        <button class="button" onclick="getAccel()">Get Accelerometer Permissions</button>
+        <div class="d-grid gap-2 col-6 mx-auto">
+            <button type="button" class="btn btn-outline-primary btn-lg" onclick="getAccel()">Start game!</button>
+        </div>
        <!-- <div class="indicatorDot" style="left:30%; top:30%;"></div> -->
         <!-- <p id="debug"> </p> -->
     </body>
