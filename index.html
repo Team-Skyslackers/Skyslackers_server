@@ -108,6 +108,9 @@
 
         <!-- login form -->
         <hr>
+        <h1 id="usernameDisplay">
+            Username
+        </h1>
         <div class="container" id="signin-form">
             <div class="card card-body"><form>
                 <div class="mb-3">
@@ -133,10 +136,11 @@
         </div>
 
         <!-- logout button -->
-        <hr>
         <div class="container" id="singout-form">
             <div class="d-grid gap-2">
-                <button id="signout-button" type="button" class="btn btn-primary">Sign out</button>
+                <button id="signout-button" type="button" class="btn btn-primary d-none">
+                    Sign out
+                </button>
             </div>
         </div>
 
@@ -243,12 +247,16 @@
                 var uid = user.uid;
                 var email = user.email;
                 currentUser = user;
-                
+                $("#signin-form").addClass("d-none");
+                $("#signout-button").removeClass("d-none");
+
                 console.log(email + " has signed in");
                 // ...
             } else {
                 // User is signed out
                 // ...
+                $("#signin-form").removeClass("d-none");
+                $("#signout-button").addClass("d-none");
 
                 console.log("No user signed in")
             }

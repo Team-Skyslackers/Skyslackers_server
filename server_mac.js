@@ -77,6 +77,9 @@ wss_Unity.on('listening',()=>{
 })
 wss_Unity.on('connection', function connection(ws_Unity) {
   console.log('Unity connected');
+  ws_Unity.on('message', function (message){
+    console.log("Unity sent: " + message);
+  })
   setInterval(
     () => {
       ws_Unity.send(rd); 
