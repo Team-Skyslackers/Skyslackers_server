@@ -4,6 +4,7 @@
         <!-- <meta charset="UTF-8"> -->
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Motion Controller</title>
+        
 
         <style>
             .imgbox {
@@ -42,235 +43,111 @@
         <!-- The core Firebase JS SDK is always required and must be listed first -->
         <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-app.js"></script>
         <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-auth.js"></script>
-        <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-firestore.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-database.js"></script>
+        <!-- <script src="https://www.gstatic.com/firebasejs/8.7.0/firebase-firestore.js"></script> -->
 
         <!-- TODO: Add SDKs for Firebase products that you want to use
             https://firebase.google.com/docs/web/setup#available-libraries -->
 
-        <script>
-        // Your web app's Firebase configuration
-        var firebaseConfig = {
-            apiKey: "AIzaSyC4gdo6gFSc_W90EBkoMNieCRqttQZ2zWw",
-            authDomain: "test-7f7c0.firebaseapp.com",
-            projectId: "test-7f7c0",
-            storageBucket: "test-7f7c0.appspot.com",
-            messagingSenderId: "531047203297",
-            appId: "1:531047203297:web:e005e20157956859bb12a0"
-        };
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        </script>
+        <script type="text/javascript" src="firebase_management.js"></script>
 
         <!-- Websocket connection -->
-        <script>
-        var ws = new WebSocket('wss://' + window.location.hostname + ':8000');
-        // event emmited when connected
-        ws.onopen = function () {
-            console.log('websocket is connected ...');
-            // window.navigator.vibrate(200);
-            // console.log(window.navigator.vibrate);
-            // sending a send event to websocket server
-            // ws.send('connectedyayyy')
-        }
-        // event emmited when receiving message 
-        ws.onmessage = function (ev) {
-            console.log(ev);
-        }
-            function getAccel(){
-                DeviceMotionEvent.requestPermission().then(response => {
-                    // document.getElementById("debug").innerHTML = "Hello";
-                    if (response == 'granted') {
-                        ws.send('g'); 
-                        // Add a listener to get smartphone orientation
-                        // in the alpha-beta-gamma axes (units in degrees)
-                        window.addEventListener('deviceorientation',(event) => {
-                            // Expose each orientation angle in a more readable way
-                            rotation_degrees = event.alpha;
-                            frontToBack_degrees = event.beta;
-                            leftToRight_degrees = event.gamma;
-                            var rd = Math.trunc(rotation_degrees);
-                            var fd = Math.trunc(frontToBack_degrees);
-                            var ld = Math.trunc(leftToRight_degrees);
-                            //ws.send("rd is " + rd.toString() + ", " + "fd is " + fd.toString() + ", " + "ld is " + ld.toString());
+        <script type="text/javascript" src="websocket_config.js"></script>
 
-                            // ws.send('alpha = '+rotation_degrees);
-                            ws.send(event.alpha + " " + event.beta + " " + event.gamma);
-                        });
-                    }
-                });
-            }
-        </script>
+        <!-- define authentication functions -->
+        <script type="text/javascript" src="auth.js"></script>
+
     </head>
     <body>
         <div class="imgbox">
             <img src="LOGO.jpg" alt="LOGO" class="center-fit">
         </div>
+        <hr>
 
         <!-- login form -->
-        <hr>
-        <h1 id="usernameDisplay">
-            Username
-        </h1>
         <div class="container" id="signin-form">
             <div class="card card-body"><form>
                 <div class="mb-3">
                   <label for="inputEmail" class="form-label">Email address</label>
                   <input type="email" class="form-control" id="inputEmail" aria-describedby="emailHelp">
-                  <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
                 </div>
                 <div class="mb-3">
                   <label for="inputPassword" class="form-label">Password</label>
                   <input type="password" class="form-control" id="inputPassword">
+                </div>
+                <div class="d-grid gap-2">
+                    <button type="button" id="signin-button" class="btn btn-primary">Sign in</button>
+                    <button type="button" id="google-signin-button" class="btn btn-info">Sign in with Google</button>
+                    <button type="button" id="show-register-button" class="btn btn-warning"
+                        onclick=" $('#signin-form').addClass('d-none'); $('#registration-form').removeClass('d-none'); ">
+                        Create new account
+                    </button>
+                  </div>
+              </form>
+            </div>
+        </div>
+
+        <!-- register form -->
+        <div class="container d-none" id="registration-form">
+            <div class="card card-body"><form>
+                <div class="mb-3">
+                  <label for="inputRegEmail" class="form-label">Email address</label>
+                  <input type="email" class="form-control" id="inputRegEmail" aria-describedby="emailHelp">
+                </div>
+                <div class="mb-3">
+                  <label for="inputRegPassword" class="form-label">Password</label>
+                  <input type="password" class="form-control" id="inputRegPassword">
+                </div>
+                <div class="mb-3">
+                  <label for="confirmRegPassword" class="form-label">Confirm Password</label>
+                  <input type="password" class="form-control" id="confirmRegPassword">
                 </div>
                 <!-- <div class="mb-3 form-check">
                   <input type="checkbox" class="form-check-input" id="exampleCheck1">
                   <label class="form-check-label" for="exampleCheck1">Check me out</label>
                 </div> -->
                 <div class="d-grid gap-2">
-                    <button type="button" id="signin-button" class="btn btn-primary">Sign in</button>
                     <button type="button" id="register-button" class="btn btn-warning">Create new account</button>
-                    <button type="button" id="google-signin-button" class="btn btn-info">Sign in with Google</button>
+                    <button type="button" id="hide-register-button" class="btn btn-primary" 
+                        onclick=" $('#signin-form').removeClass('d-none'); $('#registration-form').addClass('d-none'); ">
+                        Already have an account?
+                    </button>
                   </div>
               </form>
             </div>
         </div>
 
         <!-- logout button -->
-        <div class="container" id="singout-form">
+        <div class="container d-none" id="signout-form">
             <div class="d-grid gap-2">
-                <button id="signout-button" type="button" class="btn btn-primary d-none">
+                <button id="signout-button" type="button" class="btn btn-primary">
                     Sign out
                 </button>
             </div>
         </div>
 
-        <!-- Register function -->
         <hr>
-        <script>
-        $("#register-button").click(function(){
-            var email = $("#inputEmail").val();
-            var password = $("#inputPassword").val();
-            RegisterUser(email, password);
-        })
-        function RegisterUser(email, password){
-            firebase.auth().createUserWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    // Signed in 
-                    var user = userCredential.user;
-
-                    console.log("Successfully registered new user");
-                })
-                .catch((error) => {
-                    var errorCode = error.code;
-                    var errorMessage = error.message;
-
-                    alert(errorMessage);
-                });
-        }
-        </script>
-
-        <!-- Login function -->
-        <script>
-        $("#signin-button").click(function(){
-        var email = $("#inputEmail").val();
-        var password = $("#inputPassword").val();
-        SigninUser(email, password);
-        })
-
-        function SigninUser(email, password){
-            firebase.auth().signInWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    // Signed in
-                    var user = userCredential.user;
-
-                    console.log("Successfully signed in");
-                })
-                .catch((error) => {
-                    var errorCode = error.code;
-                    var errorMessage = error.message;
-
-                    alert(errorMessage);
-                });
-        }
-        </script>
-
-        <!-- Google signin function -->
-        <script>
-        var provider = new firebase.auth.GoogleAuthProvider();
-        // provider.addScope('https://www.googleapis.com/auth/contacts.readonly');
-        $("#google-signin-button").click(function(){
-            console.log("Google signin button triggered");
-            firebase.auth()
-                .signInWithPopup(provider)
-                .then((result) => {
-                    /** @type {firebase.auth.OAuthCredential} */
-                    var credential = result.credential;
-
-                    // This gives you a Google Access Token. You can use it to access the Google API.
-                    var token = credential.accessToken;
-                    // The signed-in user info.
-                    var user = result.user;
-                    // ...
-                }).catch((error) => {
-                    // Handle Errors here.
-                    var errorCode = error.code;
-                    var errorMessage = error.message;
-                    // The email of the user's account used.
-                    var email = error.email;
-                    // The firebase.auth.AuthCredential type that was used.
-                    var credential = error.credential;
-                    // ...
-                });
-        })
-        </script>
-
-        <!-- Logout function-->
-        <script>
-        $("#signout-button").click(function(){
-        firebase.auth().signOut()
-            .then(() => {
-                console.log("Succesfully signed out");
-            })
-            .catch((error) => {
-                console.log(error.message);
-            });
-        })
-        </script>
-
-        <!-- Change in authentication state -->
-        <script>
-        var currentUser = {};
-        firebase.auth().onAuthStateChanged((user) => {
-            if (user) {
-                // User is signed in, see docs for a list of available properties
-                // https://firebase.google.com/docs/reference/js/firebase.User
-                var uid = user.uid;
-                var email = user.email;
-                currentUser = user;
-                $("#signin-form").addClass("d-none");
-                $("#signout-button").removeClass("d-none");
-
-                console.log(email + " has signed in");
-                // ...
-            } else {
-                // User is signed out
-                // ...
-                $("#signin-form").removeClass("d-none");
-                $("#signout-button").addClass("d-none");
-
-                console.log("No user signed in")
-            }
-            });
-        </script>
-
+        
         <!-- <h1>Motion Controller</h1> -->
-        <p></p>
         <p>Point your phone towards the computer screen and tap on the button below:</p>
-        <div class="d-grid gap-2 col-6 mx-auto">
+        <!-- <div class="d-grid gap-2 col-6 mx-auto">
             <button type="button" class="btn btn-outline-primary btn-lg" onclick="getAccel()">Start game!</button>
+        </div> -->
+        <div class="container">
+            <div class="d-grid gap-2">
+                <button id="start-game-button" class="btn btn-primary btn-lg" onclick="getAccel()">
+                    Start game!
+                </button>
+            </div>
         </div>
-       <!-- <div class="indicatorDot" style="left:30%; top:30%;"></div> -->
-        <!-- <p id="debug"> </p> -->
+        <hr>
+        <div class="container">
+            <div class="d-grid gap-2">
+                <button class="btn btn-primary btn-lg" onclick="newScore(123, 123123, 3230, '2021-7-7T09:47:30')">
+                    test
+                </button>
+            </div>
+        </div>
     </body>
     
 </html>
