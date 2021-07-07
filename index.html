@@ -49,10 +49,8 @@
         <!-- TODO: Add SDKs for Firebase products that you want to use
             https://firebase.google.com/docs/web/setup#available-libraries -->
 
-        <script type="text/javascript" src="firebase_management.js"></script>
-
-        <!-- Websocket connection -->
-        <script type="text/javascript" src="websocket_config.js"></script>
+        <!-- Websocket connection, Firebase database config and management -->
+        <script type="text/javascript" src="helper.js"></script>
 
     </head>
     <body>
@@ -75,8 +73,12 @@
                   <input type="password" class="form-control" id="inputPassword">
                 </div>
                 <div class="d-grid gap-2">
-                    <button type="button" id="signin-button" class="btn btn-primary">Sign in</button>
-                    <button type="button" id="google-signin-button" class="btn btn-info">Sign in with Google</button>
+                    <button type="button" id="signin-button" class="btn btn-primary" onclick="SigninUser($('#inputEmail').val(), $('#inputPassword').val())">
+                        Sign in
+                    </button>
+                    <button type="button" id="google-signin-button" class="btn btn-info" onclick="GoogleSignin()">
+                        Sign in with Google
+                    </button>
                     <button type="button" id="show-register-button" class="btn btn-warning"
                         onclick=" $('#signin-form').addClass('d-none'); $('#registration-form').removeClass('d-none'); ">
                         Create new account
@@ -106,7 +108,10 @@
                   <label class="form-check-label" for="exampleCheck1">Check me out</label>
                 </div> -->
                 <div class="d-grid gap-2">
-                    <button type="button" id="register-button" class="btn btn-warning">Create new account</button>
+                    <button type="button" id="register-button" class="btn btn-warning" 
+                        onclick="RegisterUser($('#inputRegEmail').val(), $('#inputRegPassword').val(), $('#confirmRegPassword').val())">
+                        Create new account
+                    </button>
                     <button type="button" id="hide-register-button" class="btn btn-primary" 
                         onclick=" $('#signin-form').removeClass('d-none'); $('#registration-form').addClass('d-none'); ">
                         Already have an account?
@@ -119,14 +124,10 @@
         <!-- logout button -->
         <div class="container d-none" id="signout-form">
             <div class="d-grid gap-2">
-                <button id="signout-button" type="button" class="btn btn-primary">
+                <button id="signout-button" type="button" class="btn btn-primary" onclick="SignOut()">
                     Sign out
                 </button>
             </div>
-        </div>
-        
-        <!-- define authentication functions -->
-        <script type="text/javascript" src="auth.js"></script>
         </div>
 
         <hr>

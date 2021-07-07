@@ -54,7 +54,9 @@ var phoneClient;
 const ws = require('ws');
 const { allowedNodeEnvironmentFlags } = require('process');
 const wsUnityServer = new ws.Server({ port: 8080 })
-var unityClient;
+// var unityClient;
+
+var UID;
 
 motionControllerServer.on('connection', function (motionController) {
   phoneClient = motionController;
@@ -65,9 +67,12 @@ motionControllerServer.on('connection', function (motionController) {
       console.log('gyro info received');
       const script = 'tell application "Skyslackers" to activate';
       applescript.execString(script);
+    }else if(message.slice(0, 3) == "uid"){
+      UID = message.slice(4);
     }else{
       // relay information from phone to unity
-      unityClient.send(message);
+      // unityClient.send(message);
+      wsUnityServer.clients.forEach(unity => unity.send(message));
 
 
       // rd = message;
@@ -81,25 +86,15 @@ motionControllerServer.on('connection', function (motionController) {
   // )
 })
 
-wsUnityServer.on('listening',()=>{
-   console.log('Unity server listening on 8080')
-})
+// wsUnityServer.on('listening',()=>{
+//    console.log('Unity server listening on 8080')
+// })
 wsUnityServer.on('connection', function connection(ws_Unity) {
-  unityClient = ws_Unity;
+  // unityClient = ws_Unity;
+  ws_Unity.send("UID:" + UID);
   console.log('Unity connected');
   ws_Unity.on('message', function (message){
     console.log("Unity sent: " + message);
     phoneClient.send(message);
-    // // for "Summary" type message
-    // if (message.slice(0, 7) == "Summary"){
-      
-    // }
   })
-  // setInterval(
-  //   () => {
-  //     ws_Unity.send(rd); 
-  //     // console.log('data sent to Unity: %s', rd);
-  //   },
-  //   17 // 60Hz refresh rate == about 17ms between each update
-  // )
 })
