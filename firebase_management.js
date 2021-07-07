@@ -13,8 +13,8 @@ var firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 
 
-
 function newScore(musicId, Uid, Score, Time){
+    console.log("update database");
     firebase.database().ref('users/' + musicId).set({
         uid: Uid,
         score: Score,

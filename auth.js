@@ -1,8 +1,12 @@
 // Register function
 $("#register-button").click(function(){
-    var email = $("#inputRegEmail").val();
-    var password = $("#inputRegPassword").val();
-    RegisterUser(email, password);
+    if($("#inputRegPassword").val() != $("#confirmRegPassword").val()){
+        alert("Confirm password does not match.")
+    }else{
+        var email = $("#inputRegEmail").val();
+        var password = $("#inputRegPassword").val();
+        RegisterUser(email, password);
+    }
 })
 function RegisterUser(email, password){
     firebase.auth().createUserWithEmailAndPassword(email, password)
