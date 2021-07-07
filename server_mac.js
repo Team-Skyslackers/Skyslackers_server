@@ -45,46 +45,61 @@ app.get('/', function (req, res) {
 })
 
 var rd = "0 0 0";
-var WebSocketServer = require('ws').Server,
-  wss = new WebSocketServer({server: httpsServer})
-wss.on('connection', function (ws) {
+
+// 
+var WebSocketServer = require('ws').Server;
+motionControllerServer = new WebSocketServer({server: httpsServer})
+var phoneClient;
+
+const ws = require('ws');
+const { allowedNodeEnvironmentFlags } = require('process');
+const wsUnityServer = new ws.Server({ port: 8080 })
+var unityClient;
+
+motionControllerServer.on('connection', function (motionController) {
+  phoneClient = motionController;
   console.log('controller connected');
-  ws.on('message', function (message) {
+  motionController.on('message', function (message) {
     // console.log('received: %s', message);
     if (message == 'g') {
       console.log('gyro info received');
       const script = 'tell application "Skyslackers" to activate';
       applescript.execString(script);
     }else{
-      rd = message;
-    // console.log(rd);
+      // relay information from phone to unity
+      unityClient.send(message);
+
+
+      // rd = message;
+      // console.log(rd);
     }
     
   })
-  setInterval(
-    () => ws.send(`${new Date()}`),
-    1000
-  )
+  // setInterval(
+  //   () => motionController.send(`${new Date()}`),
+  //   1000
+  // )
 })
 
-const ws_Unity = require('ws');
-const { allowedNodeEnvironmentFlags } = require('process');
-const wss_Unity = new ws_Unity.Server({ port: 8080 },()=>{
-    console.log('server started')
-})
-wss_Unity.on('listening',()=>{
+wsUnityServer.on('listening',()=>{
    console.log('Unity server listening on 8080')
 })
-wss_Unity.on('connection', function connection(ws_Unity) {
+wsUnityServer.on('connection', function connection(ws_Unity) {
+  unityClient = ws_Unity;
   console.log('Unity connected');
   ws_Unity.on('message', function (message){
     console.log("Unity sent: " + message);
+    phoneClient.send(message);
+    // // for "Summary" type message
+    // if (message.slice(0, 7) == "Summary"){
+      
+    // }
   })
-  setInterval(
-    () => {
-      ws_Unity.send(rd); 
-      // console.log('data sent to Unity: %s', rd);
-    },
-    17 // 60Hz refresh rate == about 17ms between each update
-  )
+  // setInterval(
+  //   () => {
+  //     ws_Unity.send(rd); 
+  //     // console.log('data sent to Unity: %s', rd);
+  //   },
+  //   17 // 60Hz refresh rate == about 17ms between each update
+  // )
 })

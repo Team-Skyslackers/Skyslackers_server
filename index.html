@@ -61,6 +61,8 @@
         </div>
         <hr>
 
+        <!-- authentication -->
+        <div>
         <!-- login form -->
         <div class="container" id="signin-form">
             <div class="card card-body"><form>
@@ -125,14 +127,11 @@
         
         <!-- define authentication functions -->
         <script type="text/javascript" src="auth.js"></script>
+        </div>
 
         <hr>
         
-        <!-- <h1>Motion Controller</h1> -->
         <p>Point your phone towards the computer screen and tap on the button below:</p>
-        <!-- <div class="d-grid gap-2 col-6 mx-auto">
-            <button type="button" class="btn btn-outline-primary btn-lg" onclick="getAccel()">Start game!</button>
-        </div> -->
         <div class="container">
             <div class="d-grid gap-2">
                 <button id="start-game-button" class="btn btn-primary btn-lg" onclick="getAccel()">
@@ -141,10 +140,26 @@
             </div>
         </div>
         <hr>
+
+        <p>
+            testing database functions
+        </p>
         <div class="container">
             <div class="d-grid gap-2">
                 <button class="btn btn-primary btn-lg" onclick="newScore(123, 123123, 3230, '2021-7-7T09:47:30')">
-                    test
+                    test database
+                </button>
+            </div>
+        </div>
+
+        <hr>
+        <p>
+            testing communication
+        </p>
+        <div class="container">
+            <div class="d-grid gap-2">
+                <button class="btn btn-primary btn-lg" onclick="ws.send('test information')">
+                    test communication
                 </button>
             </div>
         </div>

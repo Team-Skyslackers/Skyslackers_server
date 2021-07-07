@@ -96,6 +96,7 @@ firebase.auth().onAuthStateChanged((user) => {
         var email = user.email;
         currentUser = user;
         $("#signin-form").addClass("d-none");
+        $("#registration-form").addClass("d-none");
         $("#signout-form").removeClass("d-none");
 
         console.log(email + " has signed in");
@@ -104,6 +105,7 @@ firebase.auth().onAuthStateChanged((user) => {
         // User is signed out
         // ...
         $("#signin-form").removeClass("d-none");
+        $("#registration-form").addClass("d-none");
         $("#signout-form").addClass("d-none");
 
         console.log("No user signed in")
