@@ -24,6 +24,14 @@ ws.onopen = function () {
 ws.onmessage = function (message) {
     console.log(message);
     // process game result
+    if(message.data.slice(0, 7) == "Summary"){
+        gameResult = JSON.parse(message.data.slice(8));
+        if (currentUser != {} && gameResult.uid == currentUser.uid){
+            newScore(gameResult.uid, gameResult.music, gameResult.score,
+                gameResult.perfect, gameResult.good, gameResult.missed,
+                gameResult.dateAndTimeUTC)
+        }
+    }
 }
 
 
@@ -154,11 +162,17 @@ function getAccel(){
     });
 }
 
-function newScore(musicId, Uid, Score, Time){
-    console.log("update database");
-    DB.ref('users/' + musicId).set({
-        uid: Uid,
+function newScore(Uid, musicID, Score, Perfect, Good, Missed, DateAndTime){
+    console.log("updating database");
+    DB.ref('users/' + Uid + '/gameScores/' + musicID).set({
         score: Score,
-        time: Time
-      });
+        perfect: Perfect,
+        good: Good,
+        missed: Missed,
+        dateAndTimeUTC: DateAndTime
+    });
+    DB.ref('leaderboard/' + musicID + '/' + Uid).set({
+        score: Score,
+        dateAndTimeUTC: DateAndTime
+    });
 }
