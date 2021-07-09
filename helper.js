@@ -34,6 +34,12 @@ ws.onmessage = function (message) {
     }
 }
 
+function getUTCDateAndTime(){
+    // example: 2021-07-03T09:28:49
+    var d = new Date();
+    return d.getUTCFullYear().toString().padStart(4, '0') + '-' + (d.getUTCMonth()+1).toString().padStart(2, '0') + '-' + d.getUTCDate().toString().padStart(2, '0') + 'T' +
+    d.getUTCHours().toString().padStart(2, '0') + ':' + d.getUTCMinutes().toString().padStart(2, '0') + ':' + d.getUTCSeconds().toString().padStart(2, '0');
+}
 
 // Register function
 function RegisterUser(email, password, confirmPassword){
@@ -46,6 +52,10 @@ function RegisterUser(email, password, confirmPassword){
             var user = userCredential.user;
 
             console.log("Successfully registered new user");
+            DB.ref('users/'+user.uid).set({
+                userEmail: email,
+                registerDateAndTimeUTC: getUTCDateAndTime()
+            });
         })
         .catch((error) => {
             var errorCode = error.code;
@@ -117,6 +127,13 @@ firebase.auth().onAuthStateChanged((user) => {
         // User is signed in, see docs for a list of available properties
         // https://firebase.google.com/docs/reference/js/firebase.User
         currentUser = user;
+
+        // update user last signin time
+        var d = new Date();
+        DB.ref('users/' + user.uid).update({
+            lastLoginDateAndTimeUTC: getUTCDateAndTime()
+        });
+
         ws.send("uid:" + user.uid);
 
         $("#signin-form").addClass("d-none");
@@ -164,15 +181,18 @@ function getAccel(){
 
 function newScore(Uid, musicID, Score, Perfect, Good, Missed, DateAndTime){
     console.log("updating database");
-    DB.ref('users/' + Uid + '/gameScores/' + musicID).set({
+
+    // update for the leaderboard
+    DB.ref('game_history/' + musicID).push({
+        userID: Uid,
         score: Score,
-        perfect: Perfect,
-        good: Good,
-        missed: Missed,
+        spec:{
+            perfect: Perfect,
+            good: Good,
+            missed: Missed,
+        },
         dateAndTimeUTC: DateAndTime
     });
-    DB.ref('leaderboard/' + musicID + '/' + Uid).set({
-        score: Score,
-        dateAndTimeUTC: DateAndTime
-    });
+
+
 }
