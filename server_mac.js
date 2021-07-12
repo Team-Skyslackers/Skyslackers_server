@@ -70,20 +70,13 @@ motionControllerServer.on('connection', function (motionController) {
     }else if(message.slice(0, 3) == "uid"){
       UID = message.slice(4);
     }else{
-      // relay information from phone to unity
-      // unityClient.send(message);
       wsUnityServer.clients.forEach(unity => unity.send(message));
-
-
-      // rd = message;
-      // console.log(rd);
     }
     
-  })
-  // setInterval(
-  //   () => motionController.send(`${new Date()}`),
-  //   1000
-  // )
+  });
+  motionController.on('close', function close(){
+    console.log('controller disconnected');
+  });
 })
 
 // wsUnityServer.on('listening',()=>{
@@ -96,5 +89,8 @@ wsUnityServer.on('connection', function connection(ws_Unity) {
   ws_Unity.on('message', function (message){
     console.log("Unity sent: " + message);
     phoneClient.send(message);
+  });
+  ws_Unity.on('close', function close(){
+    console.log("Unity disconnected");
   })
 })

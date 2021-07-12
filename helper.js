@@ -16,8 +16,12 @@ DB = firebase.database();
 
 // Initialize WebSocket
 var ws = new WebSocket('wss://' + window.location.hostname + ':8000');
+var ws_connected = false;
 ws.onopen = function () {
     console.log('websocket is connected ...');
+    ws_connected = true;
+    // tell Unity UID of current user
+    ws.send("uid:" + currentUser.uid);
 }
 
 // Process information received from unity
@@ -32,6 +36,11 @@ ws.onmessage = function (message) {
                 gameResult.dateAndTimeUTC)
         }
     }
+}
+
+ws.onclose = function (message){
+    console.log("WebSocket connection lost");
+    ws_connected = false;
 }
 
 function getUTCDateAndTime(){
@@ -135,7 +144,9 @@ firebase.auth().onAuthStateChanged((user) => {
         });
 
         // tell Unity UID of current user
-        ws.send("uid:" + user.uid);
+        if (ws_connected){
+            ws.send("uid:" + currentUser.uid);
+        }
 
         // set welcome text
         $("#welcome-text").text("Hi, "+currentUser.email);
