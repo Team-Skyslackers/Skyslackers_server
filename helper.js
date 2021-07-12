@@ -157,6 +157,8 @@ firebase.auth().onAuthStateChanged((user) => {
                 // retrieve author details
                 content += '<td>' + userInfo[val.details.author]["userEmail"] + '</td>';
                 content += '<td>' + val.difficulty + '</td>';
+                content += '<td> <button type="button" class="btn btn-primary btn-sm" onclick="selectMusic(\'' + val.storageLink.mp3 + '\', \'' + val.storageLink.csv + '\')">select</button></td>';
+                
                 content += '</tr>';
             })
             $('#listOfMusic').append(content);
@@ -203,6 +205,11 @@ function getAccel(){
             });
         }
     });
+}
+
+function selectMusic(mp3URL, csvURL){
+    ws.send("musicselected: " + mp3URL + " " + csvURL);
+    console.log("musicselected: " + mp3URL + " " + csvURL);
 }
 
 function newScore(Uid, musicID, Score, Perfect, Good, Missed, DateAndTime){
