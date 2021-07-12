@@ -134,7 +134,33 @@ firebase.auth().onAuthStateChanged((user) => {
             lastLoginDateAndTimeUTC: getUTCDateAndTime()
         });
 
+        // tell Unity UID of current user
         ws.send("uid:" + user.uid);
+
+        // set welcome text
+        $("#welcome-text").text("Hi, "+currentUser.email);
+
+        // Get all user data
+        var userInfo;
+        DB.ref('users').get().then((snapshot) => {
+            userInfo = snapshot.val();
+        });
+
+        // retrive a list of playable musics from the server
+        DB.ref("songs").get().then((snapshot) => {
+            var content = '';
+            snapshot.forEach(function(data){
+                var val = data.val();
+                content += '<tr>';
+                content += '<td>' + val.title + '</td>';
+
+                // retrieve author details
+                content += '<td>' + userInfo[val.details.author]["userEmail"] + '</td>';
+                content += '<td>' + val.difficulty + '</td>';
+                content += '</tr>';
+            })
+            $('#listOfMusic').append(content);
+        });
 
         $("#signin-form").addClass("d-none");
         $("#registration-form").addClass("d-none");
@@ -193,6 +219,19 @@ function newScore(Uid, musicID, Score, Perfect, Good, Missed, DateAndTime){
         },
         dateAndTimeUTC: DateAndTime
     });
+}
 
-
+// for test only
+function createMusicDatabase(){
+    DB.ref('songs/song3').set({
+        "difficulty": "mid",
+        "details": {
+            "author": "pp0r2amgbrfwcmnggM0SBatITRP2",
+            "creationTime": "2021-07-12T16:21:07"
+        },
+        "storageLink":{
+            "mp3": "https://firebasestorage.googleapis.com/v0/b/test-7f7c0.appspot.com/o/musicFile%2Fsong3.mp3?alt=media&token=05620b7c-5641-401d-b909-779fbaff1ad5",
+            "csv": "https://firebasestorage.googleapis.com/v0/b/test-7f7c0.appspot.com/o/musicFile%2Fsong3.csv?alt=media&token=04fc65b0-f9bd-48b5-b925-7a1cdeb60947"
+        }
+    })
 }

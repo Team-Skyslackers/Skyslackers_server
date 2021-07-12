@@ -124,6 +124,9 @@
         <!-- logout button -->
         <div class="container d-none" id="signout-form">
             <div class="d-grid gap-2">
+                <H2 id="welcome-text">
+                    Hi, anonymous user.
+                </H2>
                 <button id="signout-button" type="button" class="btn btn-primary" onclick="SignOut()">
                     Sign out
                 </button>
@@ -142,11 +145,45 @@
         </div>
         <hr>
 
+        <div class='container'>
+            <H2>
+                Song list
+            </H2>
+            <table id="listOfMusic">
+                <thead>
+                  <tr>
+                    <th scope="col">Title</th>
+                    <th scope="col">Author</th>
+                    <th scope="col">Difficulty</th>
+                  </tr>
+                </thead>
+                <!-- <tbody>
+                  <tr>
+                    <th scope="row">1</th>
+                    <td>Mark</td>
+                    <td>Otto</td>
+                    <td>@mdo</td>
+                  </tr>
+                </tbody> -->
+            </table>
+        </div>
+
+        <hr>
+
         <div class="container">
             <p>testing database functions</p>
             <div class="d-grid gap-2">
                 <button class="btn btn-primary btn-lg" onclick="newScore(123, 123123, 3230, '2021-7-7T09:47:30')">
-                    test database
+                    random new score
+                </button>
+            </div>
+        </div>
+
+        <div class="container">
+            <p>testing database functions</p>
+            <div class="d-grid gap-2">
+                <button class="btn btn-primary btn-lg" onclick="createMusicDatabase()">
+                    create music database
                 </button>
             </div>
         </div>
