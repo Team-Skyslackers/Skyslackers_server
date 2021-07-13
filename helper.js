@@ -168,7 +168,7 @@ firebase.auth().onAuthStateChanged((user) => {
                 // retrieve author details
                 content += '<td>' + userInfo[val.details.author]["userEmail"] + '</td>';
                 content += '<td>' + val.difficulty + '</td>';
-                content += '<td> <button type="button" class="btn btn-primary btn-sm" onclick="selectMusic(\'' + val.storageLink.mp3 + '\', \'' + val.storageLink.csv + '\')">select</button></td>';
+                content += '<td> <button class="btn btn-outline-primary btn-sm" onclick="selectMusic(\'' + val.storageLink.mp3 + '\', \'' + val.storageLink.csv + '\')">select</button></td>';
                 
                 content += '</tr>';
             })
@@ -178,6 +178,7 @@ firebase.auth().onAuthStateChanged((user) => {
         $("#signin-form").addClass("d-none");
         $("#registration-form").addClass("d-none");
         $("#signout-form").removeClass("d-none");
+        $("#song-list").removeClass("d-none");
 
         console.log(user.email + " has signed in");
         // ...
@@ -188,6 +189,7 @@ firebase.auth().onAuthStateChanged((user) => {
         $("#signin-form").removeClass("d-none");
         $("#registration-form").addClass("d-none");
         $("#signout-form").addClass("d-none");
+        $("#song-list").addClass("d-none");
 
         console.log("No user signed in")
     }
