@@ -152,13 +152,14 @@ firebase.auth().onAuthStateChanged((user) => {
         $("#welcome-text").text("Hi, "+currentUser.email);
 
         // get game history
-        DB.ref('users/'+currentUser.uid+'/game_history').limitToFirst(10).get().then(snapshot => {
+        DB.ref('users/'+currentUser.uid+'/game_history').limitToFirst(10).once('value', snapshot => {
             $("#game-history").html("");
             if (!snapshot.exists()) return;
             snapshot.val().forEach(historyID => {
                 // retrieve history detail
                 DB.ref('game_history/'+historyID).get().then(historyDetail => {
                     var details = historyDetail.val();
+                    var play_time = new Date(details.dateAndTimeUTC + 'Z');
                     var historyCard = '';
                     historyCard += '<div class="card">'
                     historyCard += '    <div class="card-body">'
@@ -167,7 +168,7 @@ firebase.auth().onAuthStateChanged((user) => {
                     historyCard += '        <strong>Score: '+details.score+'</strong><br>'
                     historyCard += '        Perfect: '+details.spec.perfect+' Good: '+details.spec.good+' Miss: ' + details.spec.missed
                     historyCard += '        </p>'
-                    historyCard += '    <h6 class="card-subtitle mb-2 text-muted">you played at '+ Date(details.dateAndTimeUTC + 'z') +'</h6>'
+                    historyCard += '    <h6 class="card-subtitle mb-2 text-muted">you played at '+ play_time +'</h6>'
                     // historyCard += '    <a href="#" class="card-link">View music</a>'
                     historyCard += '    </div>'
                     historyCard += '</div>'
