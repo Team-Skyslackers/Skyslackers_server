@@ -227,7 +227,7 @@ function selectMusic(mp3URL, csvURL){
 
 function newScore(Uid, musicID, Score, Perfect, Good, Missed, DateAndTime){
     console.log("updating database");
-
+    var gameHistoryID;
     // update for the leaderboard
     DB.ref('game_history/' + musicID).push({
         userID: Uid,
