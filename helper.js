@@ -151,28 +151,49 @@ firebase.auth().onAuthStateChanged((user) => {
         // set welcome text
         $("#welcome-text").text("Hi, "+currentUser.email);
 
-        // Get all user data
-        var userInfo;
-        DB.ref('users').get().then((snapshot) => {
-            userInfo = snapshot.val();
-        });
+        // get game history
+        DB.ref('users/'+currentUser.uid+'/game_history').limitToFirst(10).get().then(snapshot => {
+            $("#game-history").html("");
+            if (!snapshot.exists()) return;
+            snapshot.val().forEach(historyID => {
+                // retrieve history detail
+                DB.ref('game_history/'+historyID).get().then(historyDetail => {
+                    var details = historyDetail.val();
+                    var historyCard = '';
+                    historyCard += '<div class="card">'
+                    historyCard += '    <div class="card-body">'
+                    historyCard += '    <h4 class="card-title">'+details.musicID+'</h5>'
+                    historyCard += '    <p class="card-text">'
+                    historyCard += '        <strong>Score: '+details.score+'</strong><br>'
+                    historyCard += '        Perfect: '+details.spec.perfect+' Good: '+details.spec.good+' Miss: ' + details.spec.missed
+                    historyCard += '        </p>'
+                    historyCard += '    <h6 class="card-subtitle mb-2 text-muted">you played at '+ Date(details.dateAndTimeUTC + 'z') +'</h6>'
+                    // historyCard += '    <a href="#" class="card-link">View music</a>'
+                    historyCard += '    </div>'
+                    historyCard += '</div>'
+                    $("#game-history").append(historyCard);
+                })
+            });
+        })
 
-        // retrive a list of playable musics from the server
+        // retrieve a list of playable musics from the server
         DB.ref("songs").get().then((snapshot) => {
-            var content = '';
             snapshot.forEach(function(data){
                 var val = data.val();
-                content += '<tr>';
-                content += '<td>' + val.title + '</td>';
+                DB.ref('users/' + val.details.author).child('userEmail').get().then(email => {
+                    var content = '';
+                    content += '<tr>';
+                    content += '<td>' + val.title + '</td>';
 
-                // retrieve author details
-                content += '<td>' + userInfo[val.details.author]["userEmail"] + '</td>';
-                content += '<td>' + val.difficulty + '</td>';
-                content += '<td> <button class="btn btn-outline-primary btn-sm" onclick="selectMusic(\'' + val.storageLink.mp3 + '\', \'' + val.storageLink.csv + '\')">select</button></td>';
+                    // retrieve author details
+                    content += '<td>' + email.val() + '</td>';
+                    content += '<td>' + val.difficulty + '</td>';
+                    content += '<td> <button class="btn btn-outline-primary btn-sm" onclick="selectMusic(\'' + val.storageLink.mp3 + '\', \'' + val.storageLink.csv + '\')">select</button></td>';
                 
-                content += '</tr>';
+                    content += '</tr>';
+                    $('#listOfMusic').append(content);
+                })
             })
-            $('#listOfMusic').append(content);
         });
 
         $("#signin-form").addClass("d-none");
@@ -225,11 +246,12 @@ function selectMusic(mp3URL, csvURL){
     console.log("musicselected: " + mp3URL + " " + csvURL);
 }
 
-function newScore(Uid, musicID, Score, Perfect, Good, Missed, DateAndTime){
+function newScore(Uid, MusicID, Score, Perfect, Good, Missed, DateAndTime){
     console.log("updating database");
 
     // update for the leaderboard
-    var refToGameHistory = DB.ref('game_history/' + musicID).push({
+    var refToGameHistory = DB.ref('game_history').push({
+        musicID: MusicID,
         userID: Uid,
         score: Score,
         spec:{
