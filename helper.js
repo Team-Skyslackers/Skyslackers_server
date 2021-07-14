@@ -227,9 +227,9 @@ function selectMusic(mp3URL, csvURL){
 
 function newScore(Uid, musicID, Score, Perfect, Good, Missed, DateAndTime){
     console.log("updating database");
-    var gameHistoryID;
+
     // update for the leaderboard
-    DB.ref('game_history/' + musicID).push({
+    var refToGameHistory = DB.ref('game_history/' + musicID).push({
         userID: Uid,
         score: Score,
         spec:{
@@ -239,19 +239,50 @@ function newScore(Uid, musicID, Score, Perfect, Good, Missed, DateAndTime){
         },
         dateAndTimeUTC: DateAndTime
     });
+
+    var historyID = refToGameHistory.key;
+    // update past 10 games history
+    // get past 10 games, append, then upload
+    DB.ref('users/'+Uid).child('game_history').get().then((snapshot) => {
+        if (snapshot.exists()){
+            var history_log = snapshot.val();
+            history_log.unshift(historyID);
+            DB.ref('users/'+Uid).update({
+                'game_history': history_log
+            })
+        }else{
+            DB.ref('users/'+Uid+'/game_history').set({
+                '0': historyID
+            })
+        }
+    });
 }
 
 // for test only
-function createMusicDatabase(){
-    DB.ref('songs/song3').set({
-        "difficulty": "mid",
-        "details": {
-            "author": "pp0r2amgbrfwcmnggM0SBatITRP2",
-            "creationTime": "2021-07-12T16:21:07"
-        },
-        "storageLink":{
-            "mp3": "https://firebasestorage.googleapis.com/v0/b/test-7f7c0.appspot.com/o/musicFile%2Fsong3.mp3?alt=media&token=05620b7c-5641-401d-b909-779fbaff1ad5",
-            "csv": "https://firebasestorage.googleapis.com/v0/b/test-7f7c0.appspot.com/o/musicFile%2Fsong3.csv?alt=media&token=04fc65b0-f9bd-48b5-b925-7a1cdeb60947"
-        }
-    })
+function testFunction(){
+    // DB.ref('songs/song3').set({
+    //     "difficulty": "mid",
+    //     "details": {
+    //         "author": "pp0r2amgbrfwcmnggM0SBatITRP2",
+    //         "creationTime": "2021-07-12T16:21:07"
+    //     },
+    //     "storageLink":{
+    //         "mp3": "https://firebasestorage.googleapis.com/v0/b/test-7f7c0.appspot.com/o/musicFile%2Fsong3.mp3?alt=media&token=05620b7c-5641-401d-b909-779fbaff1ad5",
+    //         "csv": "https://firebasestorage.googleapis.com/v0/b/test-7f7c0.appspot.com/o/musicFile%2Fsong3.csv?alt=media&token=04fc65b0-f9bd-48b5-b925-7a1cdeb60947"
+    //     }
+    // })
+    
+    // update past 10 games history
+    // get past 10 games, append, then upload
+    Uid = 'eHWWBuS1xaMDInsEiJehOWXGmoG2';
+    var temp = ["Ford", "BMW", "Fiat"];
+    console.log(typeof temp);
+    temp.pop();
+    DB.ref('users/'+Uid).update({
+        'game_history': temp
+    });
+    DB.ref('users/'+Uid).child('game_history').get().then((snapshot) => {
+        console.log(snapshot.val());
+        console.log(JSON.stringify(snapshot.val()));
+    });
 }
