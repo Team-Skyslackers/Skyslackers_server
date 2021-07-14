@@ -152,7 +152,7 @@ firebase.auth().onAuthStateChanged((user) => {
         $("#welcome-text").text("Hi, "+currentUser.email);
 
         // get game history
-        DB.ref('users/'+currentUser.uid+'/game_history').limitToFirst(10).once('value', snapshot => {
+        DB.ref('users/'+currentUser.uid+'/game_history').limitToFirst(10).on('value', snapshot => {
             $("#game-history").html("");
             if (!snapshot.exists()) return;
             snapshot.val().forEach(historyID => {
