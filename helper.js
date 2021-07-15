@@ -197,10 +197,15 @@ firebase.auth().onAuthStateChanged((user) => {
             })
         });
 
-        $("#signin-form").addClass("d-none");
-        $("#registration-form").addClass("d-none");
+        $(".auth").addClass("d-none");
+        // $(".section").addClass("d-none");
+
+        // $("#signout-button").removeClass("d-none");
+        // $("#signin-form").addClass("d-none");
+        // $("#registration-form").addClass("d-none");
+        // $("#instruction").removeClass("d-none");
         $("#signout-form").removeClass("d-none");
-        $("#song-list").removeClass("d-none");
+        // $("#song-list").removeClass("d-none");
 
         console.log(user.email + " has signed in");
         // ...
@@ -208,15 +213,47 @@ firebase.auth().onAuthStateChanged((user) => {
         // User is signed out
         // ...
         currentUser = {};
-        $("#signin-form").removeClass("d-none");
-        $("#registration-form").addClass("d-none");
-        $("#signout-form").addClass("d-none");
-        $("#song-list").addClass("d-none");
+
+        $(".auth").addClass("d-none");
+        // $(".section").addClass("d-none");
+        
+        $("#openSigninPage").removeClass("d-none");
+        $("#openRegistrationPage").removeClass("d-none");
+        // $("#instruction").removeClass("d-none");
+        // $("#signin-form").removeClass("d-none");
+        // $("#registration-form").addClass("d-none");
+        // $("#signout-form").addClass("d-none");
+        // $("#song-list").addClass("d-none");
 
         console.log("No user signed in")
     }
 });
 
+function authState(state){
+    if ($("#" + state + "-form").hasClass("d-none")){
+        $("#signin-form").addClass("d-none");
+        $("#registration-form").addClass("d-none");
+        $("#" + state + "-form").removeClass("d-none");
+    }else{
+        $("#signin-form").addClass("d-none");
+        $("#registration-form").addClass("d-none");
+    }
+}
+
+function setSection(sec){
+    // sections: instruction, song-list, dashboard, 
+    $(".section").addClass("d-none");
+    $("#" + sec).removeClass("d-none");
+
+    // change button color
+    $(".section-button, .text-secondary").addClass("text-white");
+    $(".section-button, .text-secondary").removeClass("text-secondary");
+    $("#" + sec +"-button").removeClass("text-white");
+    $("#" + sec +"-button").addClass("text-secondary");
+
+    // $(".section-button").addClass("text-white");
+    // $("#" + sec +"-button").addClass("text-secondary")
+}
 
 function getAccel(){
     DeviceMotionEvent.requestPermission().then(response => {
