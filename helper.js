@@ -180,8 +180,9 @@ firebase.auth().onAuthStateChanged((user) => {
             });
         })
 
-        // retrieve a list of playable musics from the server
         DB.ref("songs").get().then((snapshot) => {
+
+            // retrieve a list of playable musics from the server
             $('#listOfMusic').append('<thead>');
             $('#listOfMusic').append('      <tr>');
             $('#listOfMusic').append('        <th scope="col">Title</th>');
@@ -206,7 +207,22 @@ firebase.auth().onAuthStateChanged((user) => {
                     $('#listOfMusic').append(content);
                 })
             })
+
+            // retrieve leaderboard
+            snapshot.forEach(function(song){
+                var songname = song.key;
+                DB.ref("game_history").orderByChild("musicID").equalTo(songname).on('value', snapshot =>{
+                    console.log(songname);
+                    var historyList = snapshot.val();
+                    console.log(historyList);
+                    for (const historyID in historyList) {
+                        console.log(historyList[historyID]);
+                    }
+                })
+            })
         });
+
+        DB.ref("game")
 
         $(".auth").addClass("d-none");
         $("#signout-form").removeClass("d-none");
