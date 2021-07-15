@@ -151,6 +151,9 @@ firebase.auth().onAuthStateChanged((user) => {
         // set welcome text
         $("#welcome-text").text("Hi, "+currentUser.email);
 
+        // remove sign in reminders
+        $(".signin-reminder").addClass("d-none");
+
         // get game history
         DB.ref('users/'+currentUser.uid+'/game_history').limitToFirst(10).on('value', snapshot => {
             $("#game-history").html("");
@@ -179,6 +182,14 @@ firebase.auth().onAuthStateChanged((user) => {
 
         // retrieve a list of playable musics from the server
         DB.ref("songs").get().then((snapshot) => {
+            $('#listOfMusic').append('<thead>');
+            $('#listOfMusic').append('      <tr>');
+            $('#listOfMusic').append('        <th scope="col">Title</th>');
+            $('#listOfMusic').append('        <th scope="col">Author</th>');
+            $('#listOfMusic').append('        <th scope="col">Difficulty</th>');
+            $('#listOfMusic').append('        <th scope="col">Select</th>');
+            $('#listOfMusic').append('      </tr>');
+            $('#listOfMusic').append('    </thead>');
             snapshot.forEach(function(data){
                 var val = data.val();
                 DB.ref('users/' + val.details.author).child('userEmail').get().then(email => {
@@ -198,14 +209,7 @@ firebase.auth().onAuthStateChanged((user) => {
         });
 
         $(".auth").addClass("d-none");
-        // $(".section").addClass("d-none");
-
-        // $("#signout-button").removeClass("d-none");
-        // $("#signin-form").addClass("d-none");
-        // $("#registration-form").addClass("d-none");
-        // $("#instruction").removeClass("d-none");
         $("#signout-form").removeClass("d-none");
-        // $("#song-list").removeClass("d-none");
 
         console.log(user.email + " has signed in");
         // ...
@@ -214,16 +218,12 @@ firebase.auth().onAuthStateChanged((user) => {
         // ...
         currentUser = {};
 
+        // sign in reminders
+        $(".signin-reminder").removeClass("d-none");
+
         $(".auth").addClass("d-none");
-        // $(".section").addClass("d-none");
-        
         $("#openSigninPage").removeClass("d-none");
         $("#openRegistrationPage").removeClass("d-none");
-        // $("#instruction").removeClass("d-none");
-        // $("#signin-form").removeClass("d-none");
-        // $("#registration-form").addClass("d-none");
-        // $("#signout-form").addClass("d-none");
-        // $("#song-list").addClass("d-none");
 
         console.log("No user signed in")
     }
