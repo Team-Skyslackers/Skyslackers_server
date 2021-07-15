@@ -212,14 +212,57 @@ firebase.auth().onAuthStateChanged((user) => {
             snapshot.forEach(function(song){
                 var songname = song.key;
                 DB.ref("game_history").orderByChild("musicID").equalTo(songname).on('value', snapshot =>{
+                    leaderboardList = $('#leaderboard-list');
+                    var newcard = '<div class="accordion-item">\
+                                        <h2 class="accordion-header" id="' + songname + 'heading">\
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse'+songname+'" aria-expanded="false" aria-controls="collapse'+songname+'">\
+                                                '+songname+'\
+                                            </button>\
+                                        </h2>\
+                                        <div id="collapse'+songname+'" class="accordion-collapse collapse" aria-labelledby="' + songname + 'heading" data-bs-parent="#leaderboard-list">\
+                                            <div class="accordion-body">';
+    
                     console.log(songname);
                     var historyList = snapshot.val();
-                    console.log(historyList);
+                    // console.log(historyList);
                     for (const historyID in historyList) {
                         console.log(historyList[historyID]);
+                        historyDetail = historyList[historyID];
+                        newcard += '        <div class="card">\
+                                                <div class="card-body">\
+                                                    <h4 class="card-title">'+historyDetail.score+'</h4>\
+                                                    <p class="card-text">\
+                                                        '+historyDetail.userID+'\
+                                                    </p>\
+                                                </div>\
+                                            </div>';
                     }
+                    newcard += '</div></div></div>';
+                    leaderboardList.append(newcard);
                 })
             })
+            // <div class="accordion-item">
+            //     <h2 class="accordion-header" id="headingOne">
+            //         <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+            //             Song1
+            //         </button>
+            //     </h2>
+            //     <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#leaderboard-list">
+
+            //         <div class="accordion-body">
+            //             <div class="card">
+            //                 <div class="card-body">
+            //                     <h4 class="card-title">title</h4>
+            //                     <p class="card-text">
+            //                         content
+            //                     </p>
+            //                 </div>
+            //             </div>
+            //         </div>
+
+            //     </div>
+            // </div>
+
         });
 
         DB.ref("game")
