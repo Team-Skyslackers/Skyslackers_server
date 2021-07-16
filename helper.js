@@ -213,6 +213,10 @@ firebase.auth().onAuthStateChanged((user) => {
                 var songname = song.key;
                 DB.ref("game_history").orderByChild("musicID").equalTo(songname).on('value', snapshot =>{
                     leaderboardList = $('#leaderboard-list');
+
+                    // reset the leaderboard when leaderboard updates
+                    leaderboardList.html("");
+                    
                     var newcard = '<div class="accordion-item">\
                                         <h2 class="accordion-header" id="' + songname + 'heading">\
                                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse'+songname+'" aria-expanded="false" aria-controls="collapse'+songname+'">\
@@ -225,12 +229,25 @@ firebase.auth().onAuthStateChanged((user) => {
                     console.log(songname);
                     var historyList = Object.values(snapshot.val());
                     console.log(historyList);
+
+                    // sort by score in descending order
                     historyList.sort((a, b) => parseInt(b.score) - parseInt(a.score));
 
-                    // console.log(historyList);
+                    // record the userID that has already been displayed on the leaderboard
+                    var displayedID=[];
+
+                    // constrains up to how many people can be displayed on the leaderboard
+                    var onlyDisplayTopHowMany = 10;
                     for (const historyID in historyList) {
                         console.log(historyList[historyID]);
                         historyDetail = historyList[historyID];
+
+                        // skip if the score belongs to a user that has already been displayed on the leaderboard with a higher score
+                        if (displayedID.includes(historyDetail.userID)){
+                            continue
+                        }else{
+                            displayedID.push(historyDetail.userID)
+                        }
                         newcard += '        <div class="card">\
                                                 <div class="card-body">\
                                                     <h4 class="card-title">'+historyDetail.score+'</h4>\
@@ -239,6 +256,9 @@ firebase.auth().onAuthStateChanged((user) => {
                                                     </p>\
                                                 </div>\
                                             </div>';
+                        if (displayedID.length >= onlyDisplayTopHowMany){
+                            break
+                        }
                     }
                     newcard += '</div></div></div>';
                     leaderboardList.append(newcard);
