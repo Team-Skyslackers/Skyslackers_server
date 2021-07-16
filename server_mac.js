@@ -23,13 +23,13 @@ for (var k in interfaces) {
 }
 
 const certs = {
-   key: fs.readFileSync(__dirname + "/key.pem", 'utf8'),
+  key: fs.readFileSync(__dirname + "/key.pem", 'utf8'),
   cert: fs.readFileSync(__dirname + "/cert.pem", 'utf8')
 };
 
 
  // Create HTTPs server.
- var httpsServer = https.createServer(certs, app).listen(8000, function () {
+var httpsServer1 = https.createServer(certs, app).listen(8000, function () {
   console.log("server running at https://" + local_IP_address.split('.')[0]+ '-'
   + local_IP_address.split('.')[1] + '-' + local_IP_address.split('.')[2] + '-' 
   + local_IP_address.split('.')[3] + ".xip.lhjmmc.cn:" + "8000/")
@@ -39,6 +39,18 @@ const certs = {
     console.log(url)
   })
 });
+
+var httpsServer2 = https.createServer(certs, app).listen(9000, function () {
+  console.log("server running at https://" + local_IP_address.split('.')[0]+ '-'
+  + local_IP_address.split('.')[1] + '-' + local_IP_address.split('.')[2] + '-' 
+  + local_IP_address.split('.')[3] + ".xip.lhjmmc.cn:" + "9000/")
+  QRCode.toString("https://" + local_IP_address.split('.')[0]+ '-'
+  + local_IP_address.split('.')[1] + '-' + local_IP_address.split('.')[2] + '-' 
+  + local_IP_address.split('.')[3] + ".xip.lhjmmc.cn:" + "9000/",{type:'terminal'}, function (err, url) {
+    console.log(url)
+  })
+});
+
 app.get('/', function (req, res) {
   console.log("request received");
   res.sendFile(__dirname + '/index.html');
@@ -48,29 +60,29 @@ var rd = "0 0 0";
 
 // 
 var WebSocketServer = require('ws').Server;
-motionControllerServer = new WebSocketServer({server: httpsServer})
-var phoneClient;
+motionControllerServer1 = new WebSocketServer({server: httpsServer1})
+var phoneClient1;
 
 const ws = require('ws');
 const { allowedNodeEnvironmentFlags } = require('process');
-const wsUnityServer = new ws.Server({ port: 8080 })
+const wsUnityServer1 = new ws.Server({ port: 8080 })
 // var unityClient;
 
-var UID;
+var UID1;
 
-motionControllerServer.on('connection', function (motionController) {
-  phoneClient = motionController;
+motionControllerServer1.on('connection', function (motionController) {
+  phoneClient1 = motionController;
   console.log('controller connected');
   motionController.on('message', function (message) {
-    // console.log('received: %s', message);
+    console.log('received: %s', message);
     if (message == 'g') {
       console.log('gyro info received');
       const script = 'tell application "Skyslackers" to activate';
       applescript.execString(script);
     }else if(message.slice(0, 3) == "uid"){
-      UID = message.slice(4);
+      UID1 = message.slice(4);
     }else{
-      wsUnityServer.clients.forEach(unity => unity.send(message));
+      wsUnityServer1.clients.forEach(unity => unity.send(message));
     }
     
   });
@@ -82,13 +94,58 @@ motionControllerServer.on('connection', function (motionController) {
 // wsUnityServer.on('listening',()=>{
 //    console.log('Unity server listening on 8080')
 // })
-wsUnityServer.on('connection', function connection(ws_Unity) {
+wsUnityServer1.on('connection', function connection(ws_Unity) {
   // unityClient = ws_Unity;
-  ws_Unity.send("UID:" + UID);
+  ws_Unity.send("UID:" + UID1);
   console.log('Unity connected');
   ws_Unity.on('message', function (message){
     console.log("Unity sent: " + message);
-    phoneClient.send(message);
+    phoneClient1.send(message);
+  });
+  ws_Unity.on('close', function close(){
+    console.log("Unity disconnected");
+  })
+})
+
+motionControllerServer2 = new WebSocketServer({server: httpsServer2})
+var phoneClient2;
+
+const wsUnityServer2 = new ws.Server({ port: 8090 })
+// var unityClient;
+
+var UID2;
+
+motionControllerServer2.on('connection', function (motionController) {
+  phoneClient2 = motionController;
+  console.log('controller connected');
+  motionController.on('message', function (message) {
+    console.log('received: %s', message);
+    if (message == 'g') {
+      console.log('gyro info received');
+      const script = 'tell application "Skyslackers" to activate';
+      applescript.execString(script);
+    }else if(message.slice(0, 3) == "uid"){
+      UID2 = message.slice(4);
+    }else{
+      wsUnityServer2.clients.forEach(unity => unity.send(message));
+    }
+    
+  });
+  motionController.on('close', function close(){
+    console.log('controller disconnected');
+  });
+})
+
+// wsUnityServer.on('listening',()=>{
+//    console.log('Unity server listening on 8080')
+// })
+wsUnityServer2.on('connection', function connection(ws_Unity) {
+  // unityClient = ws_Unity;
+  ws_Unity.send("UID:" + UID2);
+  console.log('Unity connected');
+  ws_Unity.on('message', function (message){
+    console.log("Unity sent: " + message);
+    phoneClient2.send(message);
   });
   ws_Unity.on('close', function close(){
     console.log("Unity disconnected");
