@@ -51,10 +51,14 @@ function getUTCDateAndTime(){
 }
 
 // Register function
-function RegisterUser(email, password, confirmPassword){
+function RegisterUser(username, email, password, confirmPassword){
     if (password != confirmPassword){
         alert("Confirm password does not match.");
     } else {
+        DB.ref('users').orderByChild("username").equalTo(username).get().then(snapshot => {
+            alert("Username already exists");
+            return;
+        })
         firebase.auth().createUserWithEmailAndPassword(email, password)
         .then((userCredential) => {
             // Signed in 
@@ -63,6 +67,7 @@ function RegisterUser(email, password, confirmPassword){
             console.log("Successfully registered new user");
             DB.ref('users/'+user.uid).set({
                 userEmail: email,
+                username: username,
                 registerDateAndTimeUTC: getUTCDateAndTime()
             });
         })
@@ -256,7 +261,7 @@ firebase.auth().onAuthStateChanged((user) => {
                         
                         newcard += '        <div class="card">\
                                                 <div class="card-body">\
-                                                    <h4 class="card-title ' + historyDetail.userID + '-useremail">'+historyDetail.userID+'</h4>\
+                                                    <h4 class="card-title ' + historyDetail.userID + '-username">'+historyDetail.userID+'</h4>\
                                                     <h6 class="card-text">score: '+historyDetail.score+'</h6>\
                                                     <p class="text-muted">played at '+ play_time +'</p>\
                                                 </div>\
@@ -268,10 +273,10 @@ firebase.auth().onAuthStateChanged((user) => {
                     newcard += '</div></div></div>';
                     leaderboardList.append(newcard);
 
-                    // replace UID with useremail
+                    // replace UID with username
                     for (const UID in allUIDdisplayed){
-                        DB.ref('users/' + allUIDdisplayed[UID] + '/userEmail').get().then(email => {
-                            $("." + allUIDdisplayed[UID] + "-useremail").text(email.val());
+                        DB.ref('users/' + allUIDdisplayed[UID] + '/username').get().then(username => {
+                            $("." + allUIDdisplayed[UID] + "-username").text(username.val());
                         })
                     }
                 })

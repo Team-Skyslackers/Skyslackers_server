@@ -204,6 +204,10 @@
         <div class="container auth d-none" id="registration-form">
             <div class="card card-body"><form>
                 <div class="mb-3">
+                    <label for="inputRegUsername" class="form-label">Username</label>
+                    <input type="text" class="form-control" id="inputRegUsername">
+                  </div>
+                <div class="mb-3">
                   <label for="inputRegEmail" class="form-label">Email address</label>
                   <input type="email" class="form-control" id="inputRegEmail" aria-describedby="emailHelp">
                 </div>
@@ -221,7 +225,7 @@
                 </div> -->
                 <div class="d-grid gap-2">
                     <button type="button" id="register-button" class="btn btn-warning" 
-                        onclick="RegisterUser($('#inputRegEmail').val(), $('#inputRegPassword').val(), $('#confirmRegPassword').val())">
+                        onclick="RegisterUser($('#inputRegUsername').val(), $('#inputRegEmail').val(), $('#inputRegPassword').val(), $('#confirmRegPassword').val())">
                         Create new account
                     </button>
                     <button type="button" id="hide-register-button" class="btn btn-primary" 
