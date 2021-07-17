@@ -21,8 +21,7 @@ ws.onopen = function () {
     console.log('websocket is connected ...');
     ws_connected = true;
     // tell Unity UID of current user
-    ws.send("uid:" + currentUser.uid);
-    ws.send(window.location.port);
+    ws.send("uid:" + currentUser.uid + ' '+window.location.port);
 }
 
 // Process information received from unity
