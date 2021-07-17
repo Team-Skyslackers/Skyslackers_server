@@ -15,7 +15,8 @@ for (var k in interfaces) {
   for (var i in interfaces[k]) {
     if (
       interfaces[k][i].family == "IPv4" &&
-      interfaces[k][i].address != "127.0.0.1"
+      interfaces[k][i].address != "127.0.0.1" &&
+      interfaces[k][i].internal == false
     ) {
       local_IP_address = interfaces[k][i].address;
     }
