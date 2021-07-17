@@ -146,6 +146,41 @@ function SignOut(){
     });
 }
 
+// Set user profile
+function ProfileSave(newUsername){
+    // check if chagned at all
+    if (newUsername == currentUser.username){
+        return
+    }
+
+    // check format
+    if (newUsername == "" || newUsername.includes('@')){
+        alert("Please check username format\nCannot be empty or include @")
+        return
+    }
+    
+    // check if username already exists
+    DB.ref('users').orderByChild("username").equalTo(newUsername).get().then(snapshot => {
+        if (snapshot.exists()) {
+            alert("The username has been taken, please set another username")
+        } else {
+            DB.ref('users/' + currentUser.uid).update({
+                username: newUsername
+            })
+            currentUser.username = newUsername
+            alert("Profile updated!")
+        }
+        // console.log(snapshot.val())
+        // snapshot.forEach(function(user){
+        //     console.log(user.val());
+        // })
+        // if (!snapshot.exists()){
+        //     alert("Username already exists.");
+        //     return;
+        // }
+    })
+}
+
 // Change in authentication state
 firebase.auth().onAuthStateChanged((user) => {
     if (user) {
@@ -165,7 +200,11 @@ firebase.auth().onAuthStateChanged((user) => {
                 DB.ref('users/' + user.uid).update({
                     username: snapshot.val().userEmail
                 });
+                currentUser.username = snapshot.val().userEmail
+            }else{
+                currentUser.username = snapshot.val().username
             }
+            $("#profile-username").val(currentUser.username)
         });
 
         // tell Unity UID of current user
@@ -174,7 +213,9 @@ firebase.auth().onAuthStateChanged((user) => {
         }
 
         // set welcome text
-        $("#welcome-text").text("Hi, "+currentUser.email);
+        DB.ref('users/'+currentUser.uid+'/username').get().then(username => {
+            $("#welcome-text").text("Hi, "+username.val());
+        })
 
         // remove sign in reminders
         $(".signin-reminder").addClass("d-none");
@@ -301,7 +342,6 @@ firebase.auth().onAuthStateChanged((user) => {
                     }
                 })
             })
-
         });
 
         $(".auth").addClass("d-none");
