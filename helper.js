@@ -15,13 +15,13 @@ var currentUser = {};
 DB = firebase.database();
 
 // Initialize WebSocket
-var ws = new WebSocket('wss://' + window.location.hostname + ':8000');
+var ws = new WebSocket('wss://' + window.location.hostname + ':' + window.location.port);
 var ws_connected = false;
 ws.onopen = function () {
     console.log('websocket is connected ...');
     ws_connected = true;
     // tell Unity UID of current user
-    ws.send("uid:" + currentUser.uid);
+    ws.send("uid:" + currentUser.uid + ' '+window.location.port);
 }
 
 // Process information received from unity
@@ -408,6 +408,26 @@ function setSection(sec){
 }
 
 function getAccel(){
+    var first_time = 1;
+    window.addEventListener('deviceorientation',(event) => {
+        if (first_time == 1) {
+            ws.send('g');
+            first_time = 0;
+        }
+        // Expose each orientation angle in a more readable way
+        rotation_degrees = event.alpha;
+        frontToBack_degrees = event.beta;
+        leftToRight_degrees = event.gamma;
+        var rd = Math.trunc(rotation_degrees);
+        var fd = Math.trunc(frontToBack_degrees);
+        var ld = Math.trunc(leftToRight_degrees);
+        //ws.send("rd is " + rd.toString() + ", " + "fd is " + fd.toString() + ", " + "ld is " + ld.toString());
+
+        // ws.send('alpha = '+rotation_degrees);
+        ws.send("gyro:" + event.alpha + " " + event.beta + " " + event.gamma);
+        // ws.send('gamma = '+leftToRight_degrees);
+
+    })
     DeviceMotionEvent.requestPermission().then(response => {
         // document.getElementById("debug").innerHTML = "Hello";
         if (response == 'granted') {
