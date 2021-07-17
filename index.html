@@ -293,9 +293,13 @@
               <input type="password" class="form-control" id="confirmRegPassword">
             </div> -->
             <div class="d-grid gap-2">
-                <button type="button" id="profile-save" class="btn btn-warning" 
+                <button type="button" id="profile-save" class="btn btn-primary" 
                     onclick="ProfileSave($('#profile-username').val())">
                     Save
+                </button>
+                <button type="button" id="profile-resetPasswordViaEmail" class="btn btn-warning" 
+                    onclick="ResetPasswordViaEmail()">
+                    Reset password(via Email)
                 </button>
                 <!-- <button type="button" id="hide-register-button" class="btn btn-primary" 
                     onclick=" $('#signin-form').removeClass('d-none'); $('#registration-form').addClass('d-none'); ">

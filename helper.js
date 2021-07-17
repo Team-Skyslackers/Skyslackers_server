@@ -146,6 +146,22 @@ function SignOut(){
     });
 }
 
+// Send reset password email
+function ResetPasswordViaEmail(){
+    firebase.auth().sendPasswordResetEmail(email)
+        .then(() => {
+            alert("Password reset email sent!\nPlease check your inbox.");
+            // Password reset email sent!
+            // ..
+        })
+        .catch((error) => {
+            var errorCode = error.code;
+            var errorMessage = error.message;
+            alert(errorMessage);
+            // ..
+        });
+}
+
 // Set user profile
 function ProfileSave(newUsername){
     // check if chagned at all
