@@ -54,30 +54,41 @@ function getUTCDateAndTime(){
 function RegisterUser(username, email, password, confirmPassword){
     if (password != confirmPassword){
         alert("Confirm password does not match.");
-    } else {
-        DB.ref('users').orderByChild("username").equalTo(username).get().then(snapshot => {
-            alert("Username already exists");
-            return;
-        })
-        firebase.auth().createUserWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-            // Signed in 
-            var user = userCredential.user;
-
-            console.log("Successfully registered new user");
-            DB.ref('users/'+user.uid).set({
-                userEmail: email,
-                username: username,
-                registerDateAndTimeUTC: getUTCDateAndTime()
-            });
-        })
-        .catch((error) => {
-            var errorCode = error.code;
-            var errorMessage = error.message;
-
-            alert(errorMessage);
-        });
+        return
     }
+    if (username == ""){
+        alert("Username cannot be empty.");
+        return
+    }
+    if (username.includes("@")){
+        alert("Username cannot be email address.");
+        return
+    }
+    DB.ref('users').orderByChild("username").equalTo(username).get().then(snapshot => {
+        if (!snapshot.exists()){
+            alert("Username already exists.");
+            return;
+        }else{
+            firebase.auth().createUserWithEmailAndPassword(email, password)
+            .then((userCredential) => {
+                // Signed in 
+                var user = userCredential.user;
+
+                console.log("Successfully registered new user");
+                DB.ref('users/'+user.uid).set({
+                    userEmail: email,
+                    username: username,
+                    registerDateAndTimeUTC: getUTCDateAndTime()
+                });
+            })
+            .catch((error) => {
+                var errorCode = error.code;
+                var errorMessage = error.message;
+
+                alert(errorMessage);
+            });
+        }
+    })
 }
 
 // Login function
@@ -148,6 +159,15 @@ firebase.auth().onAuthStateChanged((user) => {
             lastLoginDateAndTimeUTC: getUTCDateAndTime()
         });
 
+        // if no username then set default username to its email address
+        DB.ref('users/'+user.uid).get().then(snapshot => {
+            if (!snapshot.child('username').exists()){
+                DB.ref('users/' + user.uid).update({
+                    username: snapshot.val().userEmail
+                });
+            }
+        });
+
         // tell Unity UID of current user
         if (ws_connected){
             ws.send("uid:" + currentUser.uid);
@@ -201,13 +221,13 @@ firebase.auth().onAuthStateChanged((user) => {
             $('#listOfMusic').append('    </thead>');
             snapshot.forEach(function(data){
                 var val = data.val();
-                DB.ref('users/' + val.details.author).child('userEmail').get().then(email => {
+                DB.ref('users/' + val.details.author).child('username').get().then(username => {
                     var content = '';
                     content += '<tr>';
                     content += '<td>' + val.title + '</td>';
 
                     // retrieve author details
-                    content += '<td>' + email.val() + '</td>';
+                    content += '<td>' + username.val() + '</td>';
                     content += '<td>' + val.difficulty + '</td>';
                     content += '<td> <button class="btn btn-outline-primary btn-sm" onclick="selectMusic(\'' + val.storageLink.mp3 + '\', \'' + val.storageLink.csv + '\')">select</button></td>';
                 
