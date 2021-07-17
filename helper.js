@@ -156,15 +156,15 @@ firebase.auth().onAuthStateChanged((user) => {
 
         // get game history
         DB.ref('users/'+currentUser.uid+'/game_history').limitToFirst(10).on('value', snapshot => {
-            if(!snapshot.exists()) return;
-            $("#game-history").html("");
             if (!snapshot.exists()) return;
+            $("#game-history").html("");
             snapshot.val().forEach(historyID => {
                 // retrieve history detail
                 DB.ref('game_history/'+historyID).get().then(historyDetail => {
-                    if (!historyDetail.exists()) return;
                     var details = historyDetail.val();
                     var play_time = new Date(details.dateAndTimeUTC + 'Z');
+                    play_time = play_time.toString().split(' ')
+                    play_time = play_time[4] + ' ' + play_time[2] + ' ' + play_time[1] + ' ' + play_time[3];
                     var historyCard = '';
                     historyCard += '<div class="card">'
                     historyCard += '    <div class="card-body">'
@@ -214,8 +214,9 @@ firebase.auth().onAuthStateChanged((user) => {
             // retrieve leaderboard
             snapshot.forEach(function(song){
                 var songname = song.val().title;
-                DB.ref("game_history").orderByChild("musicID").equalTo(songname).get().then(snapshot =>{
-                    if (!snapshot.exists()) return;
+                var allUIDdisplayed = []; // for updating UID with email
+                DB.ref("game_history").orderByChild("musicID").equalTo(songname).get().then(history =>{
+                    if (!history.exists()) return;
                     leaderboardList = $('#leaderboard-list');
                     
                     var newcard = '<div class="accordion-item">\
@@ -227,9 +228,8 @@ firebase.auth().onAuthStateChanged((user) => {
                                         <div id="collapse'+songname+'" class="accordion-collapse collapse" aria-labelledby="' + songname + 'heading" data-bs-parent="#leaderboard-list">\
                                             <div class="accordion-body">';
     
-                    console.log(songname);
-                    var historyList = Object.values(snapshot.val());
-                    console.log(historyList);
+                    var historyList = Object.values(history.val());
+                    // console.log(historyList);
 
                     // sort by score in descending order
                     historyList.sort((a, b) => parseInt(b.score) - parseInt(a.score));
@@ -240,21 +240,25 @@ firebase.auth().onAuthStateChanged((user) => {
                     // constrains up to how many people can be displayed on the leaderboard
                     var onlyDisplayTopHowMany = 10;
                     for (const historyID in historyList) {
-                        console.log(historyList[historyID]);
+                        // console.log(historyList[historyID]);
                         historyDetail = historyList[historyID];
+                        var play_time = new Date(historyDetail.dateAndTimeUTC + 'Z');
+                        play_time = play_time.toString().split(' ')
+                        play_time = play_time[4] + ' ' + play_time[2] + ' ' + play_time[1] + ' ' + play_time[3];
 
                         // skip if the score belongs to a user that has already been displayed on the leaderboard with a higher score
                         if (displayedID.includes(historyDetail.userID)){
                             continue
                         }else{
                             displayedID.push(historyDetail.userID)
+                            allUIDdisplayed.push(historyDetail.userID)
                         }
+                        
                         newcard += '        <div class="card">\
                                                 <div class="card-body">\
-                                                    <h4 class="card-title">'+historyDetail.score+'</h4>\
-                                                    <p class="card-text">\
-                                                        '+historyDetail.userID+'\
-                                                    </p>\
+                                                    <h4 class="card-title ' + historyDetail.userID + '-useremail">'+historyDetail.userID+'</h4>\
+                                                    <h6 class="card-text">score: '+historyDetail.score+'</h6>\
+                                                    <p class="text-muted">played at '+ play_time +'</p>\
                                                 </div>\
                                             </div>';
                         if (displayedID.length >= onlyDisplayTopHowMany){
@@ -263,6 +267,13 @@ firebase.auth().onAuthStateChanged((user) => {
                     }
                     newcard += '</div></div></div>';
                     leaderboardList.append(newcard);
+
+                    // replace UID with useremail
+                    for (const UID in allUIDdisplayed){
+                        DB.ref('users/' + allUIDdisplayed[UID] + '/userEmail').get().then(email => {
+                            $("." + allUIDdisplayed[UID] + "-useremail").text(email.val());
+                        })
+                    }
                 })
             })
 
@@ -391,18 +402,4 @@ function testFunction(){
     //         "csv": "https://firebasestorage.googleapis.com/v0/b/test-7f7c0.appspot.com/o/musicFile%2Fsong3.csv?alt=media&token=04fc65b0-f9bd-48b5-b925-7a1cdeb60947"
     //     }
     // })
-    
-    // update past 10 games history
-    // get past 10 games, append, then upload
-    Uid = 'eHWWBuS1xaMDInsEiJehOWXGmoG2';
-    var temp = ["Ford", "BMW", "Fiat"];
-    console.log(typeof temp);
-    temp.pop();
-    DB.ref('users/'+Uid).update({
-        'game_history': temp
-    });
-    DB.ref('users/'+Uid).child('game_history').get().then((snapshot) => {
-        console.log(snapshot.val());
-        console.log(JSON.stringify(snapshot.val()));
-    });
 }
