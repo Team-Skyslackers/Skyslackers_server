@@ -66,6 +66,7 @@ var phoneClient1;
 
 const ws = require('ws');
 const { allowedNodeEnvironmentFlags } = require('process');
+
 const wsUnityServer1 = new ws.Server({ port: 8080 })
 // var unityClient;
 
@@ -75,15 +76,18 @@ motionControllerServer1.on('connection', function (motionController) {
   phoneClient1 = motionController;
   console.log('controller connected');
   motionController.on('message', function (message) {
-    console.log('received: %s', message);
+    // console.log('received: %s', message);
     if (message == 'g') {
       console.log('gyro info received');
       const script = 'tell application "Skyslackers" to activate';
       applescript.execString(script);
     }else if(message.slice(0, 3) == "uid"){
       UID1 = message.slice(4);
-    }else{
+      console.log(message);
+    }else if(message.slice(0, 4) == "gyro"){
       wsUnityServer1.clients.forEach(unity => unity.send(message));
+    }else {
+      console.log(message);
     }
     
   });
@@ -120,15 +124,18 @@ motionControllerServer2.on('connection', function (motionController) {
   phoneClient2 = motionController;
   console.log('controller connected');
   motionController.on('message', function (message) {
-    console.log('received: %s', message);
+    // console.log('received: %s', message);
     if (message == 'g') {
       console.log('gyro info received');
       const script = 'tell application "Skyslackers" to activate';
       applescript.execString(script);
     }else if(message.slice(0, 3) == "uid"){
       UID2 = message.slice(4);
-    }else{
+      console.log(message);
+    }else if(message.slice(0, 4) == "gyro"){
       wsUnityServer2.clients.forEach(unity => unity.send(message));
+    }else {
+      console.log(message);
     }
     
   });
