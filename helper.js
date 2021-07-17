@@ -156,11 +156,13 @@ firebase.auth().onAuthStateChanged((user) => {
 
         // get game history
         DB.ref('users/'+currentUser.uid+'/game_history').limitToFirst(10).on('value', snapshot => {
+            if(!snapshot.exists()) return;
             $("#game-history").html("");
             if (!snapshot.exists()) return;
             snapshot.val().forEach(historyID => {
                 // retrieve history detail
                 DB.ref('game_history/'+historyID).get().then(historyDetail => {
+                    if (!historyDetail.exists()) return;
                     var details = historyDetail.val();
                     var play_time = new Date(details.dateAndTimeUTC + 'Z');
                     var historyCard = '';
@@ -181,6 +183,7 @@ firebase.auth().onAuthStateChanged((user) => {
         })
 
         DB.ref("songs").get().then((snapshot) => {
+            if (!snapshot.exists()) return;
 
             // retrieve a list of playable musics from the server
             $('#listOfMusic').append('<thead>');
@@ -210,12 +213,10 @@ firebase.auth().onAuthStateChanged((user) => {
 
             // retrieve leaderboard
             snapshot.forEach(function(song){
-                var songname = song.key;
-                DB.ref("game_history").orderByChild("musicID").equalTo(songname).on('value', snapshot =>{
+                var songname = song.val().title;
+                DB.ref("game_history").orderByChild("musicID").equalTo(songname).get().then(snapshot =>{
+                    if (!snapshot.exists()) return;
                     leaderboardList = $('#leaderboard-list');
-
-                    // reset the leaderboard when leaderboard updates
-                    leaderboardList.html("");
                     
                     var newcard = '<div class="accordion-item">\
                                         <h2 class="accordion-header" id="' + songname + 'heading">\
@@ -266,8 +267,6 @@ firebase.auth().onAuthStateChanged((user) => {
             })
 
         });
-
-        DB.ref("game")
 
         $(".auth").addClass("d-none");
         $("#signout-form").removeClass("d-none");
