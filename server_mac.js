@@ -30,24 +30,24 @@ const certs = {
 
 
  // Create HTTPs server.
-var httpsServer1 = https.createServer(certs, app).listen(8000, function () {
+var httpsServer1 = https.createServer(certs, app).listen(18000, function () {
   console.log("server running at https://" + local_IP_address.split('.')[0]+ '-'
   + local_IP_address.split('.')[1] + '-' + local_IP_address.split('.')[2] + '-' 
-  + local_IP_address.split('.')[3] + ".xip.lhjmmc.cn:" + "8000/")
+  + local_IP_address.split('.')[3] + ".xip.lhjmmc.cn:" + "18000/")
   QRCode.toString("https://" + local_IP_address.split('.')[0]+ '-'
   + local_IP_address.split('.')[1] + '-' + local_IP_address.split('.')[2] + '-' 
-  + local_IP_address.split('.')[3] + ".xip.lhjmmc.cn:" + "8000/",{type:'terminal'}, function (err, url) {
+  + local_IP_address.split('.')[3] + ".xip.lhjmmc.cn:" + "18000/",{type:'terminal'}, function (err, url) {
     console.log(url)
   })
 });
 
-var httpsServer2 = https.createServer(certs, app).listen(9000, function () {
+var httpsServer2 = https.createServer(certs, app).listen(19000, function () {
   console.log("server running at https://" + local_IP_address.split('.')[0]+ '-'
   + local_IP_address.split('.')[1] + '-' + local_IP_address.split('.')[2] + '-' 
-  + local_IP_address.split('.')[3] + ".xip.lhjmmc.cn:" + "9000/")
+  + local_IP_address.split('.')[3] + ".xip.lhjmmc.cn:" + "19000/")
   QRCode.toString("https://" + local_IP_address.split('.')[0]+ '-'
   + local_IP_address.split('.')[1] + '-' + local_IP_address.split('.')[2] + '-' 
-  + local_IP_address.split('.')[3] + ".xip.lhjmmc.cn:" + "9000/",{type:'terminal'}, function (err, url) {
+  + local_IP_address.split('.')[3] + ".xip.lhjmmc.cn:" + "19000/",{type:'terminal'}, function (err, url) {
     console.log(url)
   })
 });
@@ -67,7 +67,7 @@ var phoneClient1;
 const ws = require('ws');
 const { allowedNodeEnvironmentFlags } = require('process');
 
-const wsUnityServer1 = new ws.Server({ port: 8080 })
+const wsUnityServer1 = new ws.Server({ port: 18080 })
 // var unityClient;
 
 var UID1;
@@ -115,7 +115,7 @@ wsUnityServer1.on('connection', function connection(ws_Unity) {
 motionControllerServer2 = new WebSocketServer({server: httpsServer2})
 var phoneClient2;
 
-const wsUnityServer2 = new ws.Server({ port: 8090 })
+const wsUnityServer2 = new ws.Server({ port: 18090 })
 // var unityClient;
 
 var UID2;
