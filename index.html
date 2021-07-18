@@ -283,7 +283,15 @@
             <div class="mb-3">
                 <label for="profile-username" class="form-label">Username</label>
                 <input type="text" class="form-control" id="profile-username">
-              </div>
+            </div>
+            <div class="mb-3">
+                <label for="profile-newpassword" class="form-label">New password</label>
+                <input type="password" class="form-control" id="profile-newpassword">
+            </div>
+            <div class="mb-3">
+                <label for="profile-confirmpassword" class="form-label">Confirm password</label>
+                <input type="password" class="form-control" id="profile-confirmpassword">
+            </div>
             <!-- <div class="mb-3">
               <label for="inputRegPassword" class="form-label">Password</label>
               <input type="password" class="form-control" id="inputRegPassword">
@@ -294,7 +302,7 @@
             </div> -->
             <div class="d-grid gap-2">
                 <button type="button" id="profile-save" class="btn btn-primary" 
-                    onclick="ProfileSave($('#profile-username').val())">
+                    onclick="ProfileSave($('#profile-username').val(), $('#profile-newpassword').val(), $('#profile-confirmpassword').val())">
                     Save
                 </button>
                 <button type="button" id="profile-resetPasswordViaEmail" class="btn btn-warning" 
