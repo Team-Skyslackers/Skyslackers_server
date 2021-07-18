@@ -65,7 +65,7 @@ function RegisterUser(username, email, password, confirmPassword){
         return
     }
     DB.ref('users').orderByChild("username").equalTo(username).get().then(snapshot => {
-        if (!snapshot.exists()){
+        if (snapshot.exists()){
             alert("Username already exists.");
             return;
         }else{
