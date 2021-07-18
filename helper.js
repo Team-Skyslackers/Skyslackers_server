@@ -371,7 +371,14 @@ firebase.auth().onAuthStateChanged((user) => {
                             comment = comments.val()[commentID];
                             allUIDdisplayed.push(comment.userID);
                             var temp_commentCard = '';
-                            temp_commentCard += '            <div class="card card-body mb-3">'
+                            
+                            //highlight comment if comment belongs to the user
+                            if (comment.userID = currentUser.uid){
+                                temp_commentCard += '            <div class="card bg-light card-body mb-3">'
+                            }else{
+                                temp_commentCard += '            <div class="card card-body mb-3">'
+                            }
+                            
                             temp_commentCard += '                <h4 class="card-subtitle ' + comment.userID + '-username">'+comment.userID+'</h4>'
                             temp_commentCard += '                <h6 class="card-text">'+comment.content+'</h6>'
 
@@ -441,8 +448,12 @@ firebase.auth().onAuthStateChanged((user) => {
                             allUIDdisplayed.push(historyDetail.userID)
                         }
                         
-                        newcard += '        <div class="card">\
-                                                <div class="card-body">\
+                        if (historyDetail.userID == currentUser.uid){
+                            newcard += '        <div class="card mb-3 bg-info">'
+                        }else{
+                            newcard += '        <div class="card mb-3">'
+                        }
+                        newcard += '            <div class="card-body">\
                                                     <h4 class="card-title ' + historyDetail.userID + '-username">'+historyDetail.userID+'</h4>\
                                                     <h6 class="card-text">score: '+historyDetail.score+'</h6>\
                                                     <p class="text-muted">played at '+ play_time +'</p>\
