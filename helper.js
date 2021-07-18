@@ -65,7 +65,7 @@ function RegisterUser(username, email, password, confirmPassword){
         return
     }
     DB.ref('users').orderByChild("username").equalTo(username).get().then(snapshot => {
-        if (!snapshot.exists()){
+        if (snapshot.exists()){
             alert("Username already exists.");
             return;
         }else{
@@ -248,6 +248,7 @@ firebase.auth().onAuthStateChanged((user) => {
         // get game history
         DB.ref('users/'+currentUser.uid+'/game_history').limitToFirst(10).on('value', snapshot => {
             if (!snapshot.exists()) return;
+
             $("#game-history").html("");
             snapshot.val().forEach(historyID => {
                 // retrieve history detail
@@ -257,7 +258,7 @@ firebase.auth().onAuthStateChanged((user) => {
                     play_time = play_time.toString().split(' ')
                     play_time = play_time[4] + ' ' + play_time[2] + ' ' + play_time[1] + ' ' + play_time[3];
                     var historyCard = '';
-                    historyCard += '<div class="card">'
+                    historyCard += '<div class="card mb-3">'
                     historyCard += '    <div class="card-body">'
                     historyCard += '    <h4 class="card-title">'+details.musicID+'</h5>'
                     historyCard += '    <p class="card-text">'
@@ -276,39 +277,112 @@ firebase.auth().onAuthStateChanged((user) => {
         DB.ref("songs").get().then((snapshot) => {
             if (!snapshot.exists()) return;
 
+            $('#listOfMusic').html("");
+
             // retrieve a list of playable musics from the server
-            $('#listOfMusic').append('<thead>');
-            $('#listOfMusic').append('      <tr>');
-            $('#listOfMusic').append('        <th scope="col">Title</th>');
-            $('#listOfMusic').append('        <th scope="col">Author</th>');
-            $('#listOfMusic').append('        <th scope="col">Difficulty</th>');
-            $('#listOfMusic').append('        <th scope="col">Select</th>');
-            $('#listOfMusic').append('      </tr>');
-            $('#listOfMusic').append('    </thead>');
             snapshot.forEach(function(data){
                 var val = data.val();
+                var songname = data.key;
                 DB.ref('users/' + val.details.author).child('username').get().then(username => {
                     var content = '';
-                    content += '<tr>';
-                    content += '<td>' + val.title + '</td>';
+                    content += '<div class="card mb-3">'
+                    content += '    <div class="card-body">'
+                    content += '        <div class="row">'
+                    content += '            <h4 class="card-title col">'+val.title+'</h4>'
+                    content += '            <h6 class="card-text col">Difficulty: ' + val.difficulty + '</h6>'
+                    content += '        </div>'
+                    content += '        <div class="row">'
+                    content += '            <p class="card-text col-4">By:\n'+username.val()+'</p>'
+                    content += '            <div class="col-4">'
+                    content += '                <a href="#' + songname + '-detail" class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#' + songname + '-detail" aria-expanded="false" aria-controls="' + val.musicID + '-detail">Detail</a>'
+                    content += '            </div>'
+                    content += '            <div class="col-4">'
+                    content += '                <button class="btn btn-info" onclick="selectMusic(\'' + val.storageLink.mp3 + '\', \'' + val.storageLink.csv + '\')">Play</button>'
+                    content += '            </div>'
+                    content += '        </div>'
+                    content += '        <div class="collapse" id="' + songname + '-detail">'
+                    content += '            <hr>'
+                    content += '            <h4>Info</h4>'
+                    // info about the map
+                    var creation_time = new Date(val.details.creationTime + 'Z');
+                    creation_time = creation_time.toString().split(' ')
+                    creation_time = creation_time[4] + ' ' + creation_time[2] + ' ' + creation_time[1] + ' ' + creation_time[3];
+                    content += '            <h6>Creator: '+ username.val() +'</h6>'
+                    content += '            <h6>Creation time: '+ creation_time +'</h6>'
+                    content += '            <h6 id="'+ songname +'-timesPlayed">Played: many times</h6>' // needs update separately
 
-                    // retrieve author details
-                    content += '<td>' + username.val() + '</td>';
-                    content += '<td>' + val.difficulty + '</td>';
-                    content += '<td> <button class="btn btn-outline-primary btn-sm" onclick="selectMusic(\'' + val.storageLink.mp3 + '\', \'' + val.storageLink.csv + '\')">select</button></td>';
-                
-                    content += '</tr>';
+                    content += '            <h4>Recent comments</h4>'
+                    content += '            <div style="padding: 0px;" id="'+songname+'-commentSection">Comments</div>'
+                    content += '            <div class="mb-3">'
+                    content += '                <label for="' + songname + '-commentinput" class="form-label">New comment</label>'
+                    content += '                <input type="text" class="form-control" id="'+songname+'-commentinput">'
+                    content += '            </div>'
+                    content += '            <button class="btn btn-primary mb-3" onclick="postComment(\''+songname+'\')">Post comment</button>'
+                    content += '        </div>'
+                    content += '    </div>'
+                    content += '</div>'
                     $('#listOfMusic').append(content);
+
+                    // update number of times played
+                    DB.ref("game_history").orderByChild("musicID").equalTo(songname).get().then(history =>{
+                        if (history.exists()){
+                            $("#"+songname+"-timesPlayed").text("Played: "+Object.keys(history.val()).length +" time(s)")
+                        }else{
+                            $("#"+songname+"-timesPlayed").text("Has not been played yet")
+                        }
+                    })
+
+                    // update comment section
+                    DB.ref('songs/' + songname + "/comments").limitToLast(3).on('value', comments =>{
+                        var allUIDdisplayed = []; // for updating UID with username
+                        var commentSection = $("#" + songname + "-commentSection");
+                        
+                        // empty comment section before each refresh
+                        commentSection.html("");
+
+                        // reset if no comment
+                        if (!comments.exists()) return
+
+                        // show as cards
+                        var commentCard = ""
+                        for (const commentID in comments.val()){
+                            comment = comments.val()[commentID];
+                            allUIDdisplayed.push(comment.userID);
+                            var temp_commentCard = '';
+                            temp_commentCard += '            <div class="card card-body mb-3">'
+                            temp_commentCard += '                <h4 class="card-subtitle ' + comment.userID + '-username">'+comment.userID+'</h4>'
+                            temp_commentCard += '                <h6 class="card-text">'+comment.content+'</h6>'
+
+                            var comment_time = new Date(comment.dateAndTimeUTC + 'Z');
+                            comment_time = comment_time.toString().split(' ')
+                            comment_time = comment_time[4] + ' ' + comment_time[2] + ' ' + comment_time[1] + ' ' + comment_time[3];
+
+                            temp_commentCard += '                <h6 class="card-text text-muted">'+comment_time+'</h6>'
+                            temp_commentCard += '            </div>'
+                            commentCard = temp_commentCard + commentCard;
+                        }
+
+                        commentSection.append(commentCard);
+
+                        // replace UID with username
+                        for (const UID in allUIDdisplayed){
+                            DB.ref('users/' + allUIDdisplayed[UID] + '/username').get().then(username => {
+                                $("." + allUIDdisplayed[UID] + "-username").text(username.val());
+                            })
+                        }
+
+                    })
                 })
             })
 
             // retrieve leaderboard
+            leaderboardList = $('#leaderboard-list');
+            leaderboardList.html("");
             snapshot.forEach(function(song){
                 var songname = song.val().title;
-                var allUIDdisplayed = []; // for updating UID with email
+                var allUIDdisplayed = []; // for updating UID with username
                 DB.ref("game_history").orderByChild("musicID").equalTo(songname).get().then(history =>{
                     if (!history.exists()) return;
-                    leaderboardList = $('#leaderboard-list');
                     
                     var newcard = '<div class="accordion-item">\
                                         <h2 class="accordion-header" id="' + songname + 'heading">\
@@ -389,6 +463,17 @@ firebase.auth().onAuthStateChanged((user) => {
         console.log("No user signed in")
     }
 });
+
+function postComment(musicID){
+    var comment = $("#"+musicID+"-commentinput").val();
+    DB.ref("songs/" + musicID + "/comments").push({
+        dateAndTimeUTC: getUTCDateAndTime(),
+        content: comment,
+        userID: currentUser.uid
+    });
+    $("#"+musicID+"-commentinput").val("");
+    alert("comment posted!")
+}
 
 function authState(state){
     if ($("#" + state + "-form").hasClass("d-none")){
