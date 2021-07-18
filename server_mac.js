@@ -84,10 +84,8 @@ motionControllerServer1.on('connection', function (motionController) {
     }else if(message.slice(0, 3) == "uid"){
       UID1 = message.split(" ")[0].slice(4);
       console.log(message);
-    }else if(message.slice(0, 4) == "gyro"){
-      wsUnityServer1.clients.forEach(unity => unity.send(message));
     }else {
-      console.log(message);
+      wsUnityServer1.clients.forEach(unity => unity.send(message));
     }
     
   });
@@ -132,10 +130,8 @@ motionControllerServer2.on('connection', function (motionController) {
     }else if(message.slice(0, 3) == "uid"){
       UID2 = message.split(" ")[0].slice(4);
       console.log(message);
-    }else if(message.slice(0, 4) == "gyro"){
-      wsUnityServer2.clients.forEach(unity => unity.send(message));
     }else {
-      console.log(message);
+      wsUnityServer2.clients.forEach(unity => unity.send(message));
     }
     
   });
