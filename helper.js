@@ -311,8 +311,8 @@ firebase.auth().onAuthStateChanged((user) => {
                     content += '            <h6>Creation time: '+ creation_time +'</h6>'
                     content += '            <h6 id="'+ songname +'-timesPlayed">Played: many times</h6>' // needs update separately
 
-                    content += '            <h4>Recent comments</h4>'
-                    content += '            <div style="padding: 0px;" id="'+songname+'-commentSection">Comments</div>'
+                    content += '            <h4>Comments</h4>'
+                    content += '            <div class="overflow-auto" style="padding: 0px; max-height: 50vh" id="'+songname+'-commentSection">Comments</div>'
                     content += '            <div class="mb-3">'
                     content += '                <label for="' + songname + '-commentinput" class="form-label">New comment</label>'
                     content += '                <input type="text" class="form-control" id="'+songname+'-commentinput">'
@@ -333,7 +333,7 @@ firebase.auth().onAuthStateChanged((user) => {
                     })
 
                     // update comment section
-                    DB.ref('songs/' + songname + "/comments").limitToLast(3).on('value', comments =>{
+                    DB.ref('songs/' + songname + "/comments").on('value', comments =>{
                         var allUIDdisplayed = []; // for updating UID with username
                         var commentSection = $("#" + songname + "-commentSection");
                         
