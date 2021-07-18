@@ -274,15 +274,34 @@ firebase.auth().onAuthStateChanged((user) => {
             });
         })
 
+        // retrieve a list of playable musics from the server
         DB.ref("songs").get().then((snapshot) => {
             if (!snapshot.exists()) return;
 
             $('#listOfMusic').html("");
 
-            // retrieve a list of playable musics from the server
             snapshot.forEach(function(data){
                 var val = data.val();
                 var songname = data.key;
+
+                // update dashboard - new maps
+                var creation_time = new Date(val.details.creationTime + 'Z');
+                var diff = Math.abs(new Date() - creation_time) / (1000*60*60*24); // in days
+                if (diff <= 7){ // uploaded within 7 days
+                    // add to recent uploads
+                    var temp = "";
+                    temp += '<div class="card bg-info mb-3">'
+                    temp += '    <div class="card-body">'
+                    temp += '       <h4 class="card-title">New map!</h4>'
+                    temp += '       <h6 class="card-text">'+songname+'</h6>'
+                    temp += '       <h6 class="card-text text-muted">Uploaded '+Math.floor(diff)+' day(s) ago</h6>'
+                    temp += '    </div>'
+                    temp += '</div>'
+                    $("#new-maps-notification").append(temp);
+                }
+
+
+                // update list of maps
                 DB.ref('users/' + val.details.author).child('username').get().then(username => {
                     var content = '';
                     content += '<div class="card mb-3">'
