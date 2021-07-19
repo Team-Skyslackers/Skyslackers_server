@@ -256,13 +256,15 @@ firebase.auth().onAuthStateChanged((user) => {
                     var details = historyDetail.val();
                     var play_time = new Date(details.dateAndTimeUTC + 'Z');
                     play_time = play_time.toString().split(' ')
-                    play_time = play_time[4] + ' ' + play_time[2] + ' ' + play_time[1] + ' ' + play_time[3];
+                    play_time = play_time[2] + ' ' + play_time[1] + ' ' + play_time[3] + ' ' + play_time[4];
                     var historyCard = '';
                     historyCard += '<div class="card mb-3">'
                     historyCard += '    <div class="card-body">'
-                    historyCard += '    <h4 class="card-title">'+details.musicID+'</h5>'
+                    historyCard += '    <div class="row">'
+                    historyCard += '        <h4 class="card-title col-6">'+details.musicID+'</h4>'
+                    historyCard += '        <h5 class="card-text col-6" style="text-align: right"><strong>Score: '+details.score+'</strong></h5>'
+                    historyCard += '    </div>'
                     historyCard += '    <p class="card-text">'
-                    historyCard += '        <strong>Score: '+details.score+'</strong><br>'
                     historyCard += '        Perfect: '+details.spec.perfect+' Good: '+details.spec.good+' Miss: ' + details.spec.missed
                     historyCard += '        </p>'
                     historyCard += '    <h6 class="card-subtitle mb-2 text-muted">you played at '+ play_time +'</h6>'
@@ -290,11 +292,16 @@ firebase.auth().onAuthStateChanged((user) => {
                 if (diff <= 7){ // uploaded within 7 days
                     // add to recent uploads
                     var temp = "";
-                    temp += '<div class="card bg-info mb-3">'
-                    temp += '    <div class="card-body">'
+                    temp += '<div class="card bg-info bg-gradient mb-3" id="'+songname+'-new-map-notification">'
+                    temp += '    <div class="card-body row">'
+                    temp += '    <div class="col-8">'
                     temp += '       <h4 class="card-title">New map!</h4>'
-                    temp += '       <h6 class="card-text">'+songname+'</h6>'
-                    temp += '       <h6 class="card-text text-muted">Uploaded '+Math.floor(diff)+' day(s) ago</h6>'
+                    temp += '       <h6 class="card-text"><strong>'+songname+'</strong></h6>'
+                    temp += '       <h6 class="card-text text-muted">Published '+Math.floor(diff)+' day(s) ago</h6>'
+                    temp += '    </div>'
+                    temp += '    <div class="col-4">'
+                    temp += '       <button class="btn btn-outline-primary" onclick="$(\'#'+songname+'-new-map-notification\').fadeOut()">dismiss</button>'
+                    temp += '    </div>'
                     temp += '    </div>'
                     temp += '</div>'
                     $("#new-maps-notification").append(temp);
@@ -325,7 +332,7 @@ firebase.auth().onAuthStateChanged((user) => {
                     // info about the map
                     var creation_time = new Date(val.details.creationTime + 'Z');
                     creation_time = creation_time.toString().split(' ')
-                    creation_time = creation_time[4] + ' ' + creation_time[2] + ' ' + creation_time[1] + ' ' + creation_time[3];
+                    creation_time = creation_time[2] + ' ' + creation_time[1] + ' ' + creation_time[3] + ' ' + creation_time[4];
                     content += '            <h6>Creator: '+ username.val() +'</h6>'
                     content += '            <h6>Creation time: '+ creation_time +'</h6>'
                     content += '            <h6 id="'+ songname +'-timesPlayed">Played: many times</h6>' // needs update separately
@@ -379,14 +386,17 @@ firebase.auth().onAuthStateChanged((user) => {
                                 temp_commentCard += '            <div class="card card-body mb-3">'
                             }
                             
-                            temp_commentCard += '                <h4 class="card-subtitle ' + comment.userID + '-username">'+comment.userID+'</h4>'
-                            temp_commentCard += '                <h6 class="card-text">'+comment.content+'</h6>'
+                            temp_commentCard += '                <h4 class="card-text">'+comment.content+'</h4>'
+                            temp_commentCard += '                <div class="row">'
+                            temp_commentCard += '                    <h6 class="col-4 card-subtitle ' + comment.userID + '-username">'+comment.userID+'</h6>'
 
                             var comment_time = new Date(comment.dateAndTimeUTC + 'Z');
                             comment_time = comment_time.toString().split(' ')
-                            comment_time = comment_time[4] + ' ' + comment_time[2] + ' ' + comment_time[1] + ' ' + comment_time[3];
+                            comment_time = comment_time[2] + ' ' + comment_time[1] + ' ' + comment_time[3] + ' ' + comment_time[4];
 
-                            temp_commentCard += '                <h6 class="card-text text-muted">'+comment_time+'</h6>'
+                            temp_commentCard += '                    <h6 class="col-8 card-text text-muted">'+comment_time+'</h6>'
+                            temp_commentCard += '                </div>'
+
                             temp_commentCard += '            </div>'
                             commentCard = temp_commentCard + commentCard;
                         }
@@ -438,7 +448,7 @@ firebase.auth().onAuthStateChanged((user) => {
                         historyDetail = historyList[historyID];
                         var play_time = new Date(historyDetail.dateAndTimeUTC + 'Z');
                         play_time = play_time.toString().split(' ')
-                        play_time = play_time[4] + ' ' + play_time[2] + ' ' + play_time[1] + ' ' + play_time[3];
+                        play_time = play_time[2] + ' ' + play_time[1] + ' ' + play_time[3] + ' ' + play_time[4];
 
                         // skip if the score belongs to a user that has already been displayed on the leaderboard with a higher score
                         if (displayedID.includes(historyDetail.userID)){
