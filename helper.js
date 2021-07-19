@@ -276,6 +276,9 @@ firebase.auth().onAuthStateChanged((user) => {
             });
         })
 
+        // get friends list
+        getFriendsList()
+
         // retrieve a list of playable musics from the server
         DB.ref("songs").get().then((snapshot) => {
             if (!snapshot.exists()) return;
@@ -314,7 +317,7 @@ firebase.auth().onAuthStateChanged((user) => {
                     content += '<div class="card mb-3">'
                     content += '    <div class="card-body">'
                     content += '        <div class="row">'
-                    content += '            <h4 class="card-title col">'+val.title+'</h4>'
+                    content += '            <h4 class="card-title col">'+songname+'</h4>'
                     content += '            <h6 class="card-text col">Difficulty: ' + val.difficulty + '</h6>'
                     content += '        </div>'
                     content += '        <div class="row">'
@@ -323,7 +326,12 @@ firebase.auth().onAuthStateChanged((user) => {
                     content += '                <a href="#' + songname + '-detail" class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#' + songname + '-detail" aria-expanded="false" aria-controls="' + val.musicID + '-detail">Detail</a>'
                     content += '            </div>'
                     content += '            <div class="col-4">'
-                    content += '                <button class="btn btn-info" onclick="selectMusic(\'' + val.storageLink.mp3 + '\', \'' + val.storageLink.csv + '\')">Play</button>'
+
+                    // if have link then get button, otherwise no button
+                    if (Object.keys(val).includes("storageLink")){
+                        content += '                <button class="btn btn-info" onclick="selectMusic(\'' + val.storageLink.mp3 + '\', \'' + val.storageLink.csv + '\')">Play</button>'
+                    }
+
                     content += '            </div>'
                     content += '        </div>'
                     content += '        <div class="collapse" id="' + songname + '-detail">'
@@ -418,7 +426,7 @@ firebase.auth().onAuthStateChanged((user) => {
             leaderboardList = $('#leaderboard-list');
             leaderboardList.html("");
             snapshot.forEach(function(song){
-                var songname = song.val().title;
+                var songname = song.key;
                 var allUIDdisplayed = []; // for updating UID with username
                 DB.ref("game_history").orderByChild("musicID").equalTo(songname).get().then(history =>{
                     if (!history.exists()) return;
@@ -459,7 +467,7 @@ firebase.auth().onAuthStateChanged((user) => {
                         }
                         
                         if (historyDetail.userID == currentUser.uid){
-                            newcard += '        <div class="card mb-3 bg-info">'
+                            newcard += '        <div class="card mb-3 bg-light">'
                         }else{
                             newcard += '        <div class="card mb-3">'
                         }
@@ -498,6 +506,17 @@ firebase.auth().onAuthStateChanged((user) => {
 
         // sign in reminders
         $(".signin-reminder").removeClass("d-none");
+
+        // reset contents
+        $('#listOfMusic').html("");
+        $('#leaderboard-list').html("");
+        $("#new-maps-notification").html("");
+        $("#game-history").html("");
+        $("#profile-username").val("");
+        $("#profile-newpassword").val("");
+        $("#profile-confirmpassword").val("");
+
+
 
         $(".auth").addClass("d-none");
         $("#openSigninPage").removeClass("d-none");
@@ -593,6 +612,72 @@ function selectMusic(mp3URL, csvURL){
     console.log("musicselected: " + mp3URL + " " + csvURL);
 }
 
+function getFriendsList(){
+    DB.ref('users/' + currentUser.uid).get().then(user => {
+        $("#listOfFriends").html("");
+        if (!user.exists() || !Object.keys(user.val()).includes("friends")) {
+            $("#listOfFriends").html("No friends yet. Add some friends now!")
+            return
+        }
+        var friends = user.val().friends;
+        for(const friendID in friends){
+            DB.ref('users/'+friendID).get().then(friend => {
+                var friendcard = ""
+                var friend_time = new Date(friends[friendID].friend_time + 'Z');
+                friend_time = friend_time.toString().split(' ')
+                friend_time = friend_time[2] + ' ' + friend_time[1] + ' ' + friend_time[3];
+
+                friendcard += '<div class="card mb-3">'
+                friendcard += '    <div class="card-body">'
+                friendcard += '        <div class="row">'
+                friendcard += '            <h4 class="card-title col-8">'+friend.val().username+'</h4>'
+                friendcard += '            <div class="col-4">'
+                friendcard += '                <button class="btn btn-outline-secondary" onclick="removeFriend(\''+friendID+'\')">remove</button>'
+                friendcard += '            </div>'
+                friendcard += '        </div>'
+                friendcard += '        <h6 class="card-subtitle mb-2 text-muted">Friended on '+ friend_time +'</h6>'
+
+                // show recent game
+                friendcard += '    </div>'
+                friendcard += '</div>'
+
+                $("#listOfFriends").append(friendcard);
+            })
+        }
+    })
+}
+
+function newFriend(friend_username){
+    DB.ref('users').orderByChild("username").equalTo(friend_username).get().then(search_result => {
+        if (!search_result.exists()){
+            alert("User does not exist!")
+            return
+        }
+        var friend_uid = Object.keys(search_result.val())[0]
+        DB.ref('users/'+currentUser.uid+'/friends/'+friend_uid).get().then(friend=>{
+            if(friend.exists()){
+                alert("You have previously added "+friend_username+" as your friend.")
+            }else{
+                DB.ref('users/'+currentUser.uid+'/friends/'+friend_uid).set({
+                    friend_time: getUTCDateAndTime()
+                })
+                getFriendsList()
+            }
+        })
+    })
+}
+
+function removeFriend(friend_uid){
+    DB.ref('users/'+currentUser.uid+'/friends/'+friend_uid).get().then(snapshot=>{
+        if(!snapshot.exists()){
+            alert("already removed")
+            return
+        }
+        DB.ref('users/'+currentUser.uid+'/friends/'+friend_uid).remove()
+        getFriendsList()
+    })
+}
+
 function newScore(Uid, MusicID, Score, Perfect, Good, Missed, DateAndTime){
     console.log("updating database");
 
@@ -628,16 +713,12 @@ function newScore(Uid, MusicID, Score, Perfect, Good, Missed, DateAndTime){
 }
 
 // for test only
-function testFunction(){
-    // DB.ref('songs/song3').set({
-    //     "difficulty": "mid",
-    //     "details": {
-    //         "author": "pp0r2amgbrfwcmnggM0SBatITRP2",
-    //         "creationTime": "2021-07-12T16:21:07"
-    //     },
-    //     "storageLink":{
-    //         "mp3": "https://firebasestorage.googleapis.com/v0/b/test-7f7c0.appspot.com/o/musicFile%2Fsong3.mp3?alt=media&token=05620b7c-5641-401d-b909-779fbaff1ad5",
-    //         "csv": "https://firebasestorage.googleapis.com/v0/b/test-7f7c0.appspot.com/o/musicFile%2Fsong3.csv?alt=media&token=04fc65b0-f9bd-48b5-b925-7a1cdeb60947"
-    //     }
-    // })
-}
+// function testFunction(){
+//     DB.ref('songs/song1').set({
+//         "difficulty": "mid",
+//         "details": {
+//             "author": "pp0r2amgbrfwcmnggM0SBatITRP2",
+//             "creationTime": "2021-07-12T16:21:07"
+//         }
+//     })
+// }
