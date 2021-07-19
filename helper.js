@@ -246,35 +246,7 @@ firebase.auth().onAuthStateChanged((user) => {
         $(".signin-reminder").addClass("d-none");
 
         // get game history
-        DB.ref('users/'+currentUser.uid+'/game_history').limitToFirst(10).on('value', snapshot => {
-            if (!snapshot.exists()) return;
-
-            $("#game-history").html("");
-            snapshot.val().forEach(historyID => {
-                // retrieve history detail
-                DB.ref('game_history/'+historyID).get().then(historyDetail => {
-                    var details = historyDetail.val();
-                    var play_time = new Date(details.dateAndTimeUTC + 'Z');
-                    play_time = play_time.toString().split(' ')
-                    play_time = play_time[2] + ' ' + play_time[1] + ' ' + play_time[3] + ' ' + play_time[4];
-                    var historyCard = '';
-                    historyCard += '<div class="card mb-3">'
-                    historyCard += '    <div class="card-body">'
-                    historyCard += '    <div class="row">'
-                    historyCard += '        <h4 class="card-title col-6">'+details.musicID+'</h4>'
-                    historyCard += '        <h5 class="card-text col-6" style="text-align: right"><strong>Score: '+details.score+'</strong></h5>'
-                    historyCard += '    </div>'
-                    historyCard += '    <p class="card-text">'
-                    historyCard += '        Perfect: '+details.spec.perfect+' Good: '+details.spec.good+' Miss: ' + details.spec.missed
-                    historyCard += '        </p>'
-                    historyCard += '    <h6 class="card-subtitle mb-2 text-muted">you played at '+ play_time +'</h6>'
-                    // historyCard += '    <a href="#" class="card-link">View music</a>'
-                    historyCard += '    </div>'
-                    historyCard += '</div>'
-                    $("#game-history").append(historyCard);
-                })
-            });
-        })
+        getHistoryList()
 
         // get friends list
         getFriendsList()
@@ -290,25 +262,29 @@ firebase.auth().onAuthStateChanged((user) => {
                 var songname = data.key;
 
                 // update dashboard - new maps
-                var creation_time = new Date(val.details.creationTime + 'Z');
-                var diff = Math.abs(new Date() - creation_time) / (1000*60*60*24); // in days
-                if (diff <= 7){ // uploaded within 7 days
-                    // add to recent uploads
-                    var temp = "";
-                    temp += '<div class="card bg-info bg-gradient mb-3" id="'+songname+'-new-map-notification">'
-                    temp += '    <div class="card-body row">'
-                    temp += '    <div class="col-8">'
-                    temp += '       <h4 class="card-title">New map!</h4>'
-                    temp += '       <h6 class="card-text"><strong>'+songname+'</strong></h6>'
-                    temp += '       <h6 class="card-text text-muted">Published '+Math.floor(diff)+' day(s) ago</h6>'
-                    temp += '    </div>'
-                    temp += '    <div class="col-4">'
-                    temp += '       <button class="btn btn-outline-primary" onclick="$(\'#'+songname+'-new-map-notification\').fadeOut()">dismiss</button>'
-                    temp += '    </div>'
-                    temp += '    </div>'
-                    temp += '</div>'
-                    $("#new-maps-notification").append(temp);
-                }
+                DB.ref('users/' + currentUser.uid + '/NewMapNotification/' + songname).get().then(notification_state => {
+                    if (!notification_state.exists()){
+                        var creation_time = new Date(val.details.creationTime + 'Z');
+                        var diff = Math.abs(new Date() - creation_time) / (1000*60*60*24); // in days
+                        if (diff <= 7){ // uploaded within 7 days
+                            // add to recent uploads
+                            var temp = "";
+                            temp += '<div class="card bg-success bg-gradient mb-3" id="'+songname+'-new-map-notification">'
+                            temp += '    <div class="card-body row">'
+                            temp += '    <div class="col-8">'
+                            temp += '       <h4 class="card-title">New map!</h4>'
+                            temp += '       <h6 class="card-text"><strong>'+songname+'</strong></h6>'
+                            temp += '       <h6 class="card-text">Published '+Math.floor(diff)+' day(s) ago</h6>'
+                            temp += '    </div>'
+                            temp += '    <div class="col-4">'
+                            temp += '       <button class="btn btn-secondary" onclick="$(\'#'+songname+'-new-map-notification\').fadeOut(); dismissNewMapNotification(\''+songname+'\')">dismiss</button>'
+                            temp += '    </div>'
+                            temp += '    </div>'
+                            temp += '</div>'
+                            $("#new-maps-notification").append(temp);
+                        }
+                    }
+                })
 
 
                 // update list of maps
@@ -321,19 +297,19 @@ firebase.auth().onAuthStateChanged((user) => {
                     content += '            <h6 class="card-text col">Difficulty: ' + val.difficulty + '</h6>'
                     content += '        </div>'
                     content += '        <div class="row">'
-                    content += '            <p class="card-text col-4">By:\n'+username.val()+'</p>'
+                    content += '            <div class="col-8">'
+                    content += '                <p class="card-text">By:\n'+username.val()+'</p>'
+                    content += '            </div>'
                     content += '            <div class="col-4">'
                     content += '                <a href="#' + songname + '-detail" class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#' + songname + '-detail" aria-expanded="false" aria-controls="' + val.musicID + '-detail">Detail</a>'
                     content += '            </div>'
-                    content += '            <div class="col-4">'
-
+                    content += '        </div>'
                     // if have link then get button, otherwise no button
                     if (Object.keys(val).includes("storageLink")){
-                        content += '                <button class="btn btn-info" onclick="selectMusic(\'' + val.storageLink.mp3 + '\', \'' + val.storageLink.csv + '\')">Play</button>'
+                        content += '            <div style="text-align:center;">'
+                        content += '            <button class="btn btn-info" style="margin-top: 6px; left: 50%; width: 80%" onclick="selectMusic(\'' + val.storageLink.mp3 + '\', \'' + val.storageLink.csv + '\')">Start Game</button>'
+                        content += '            </div>'
                     }
-
-                    content += '            </div>'
-                    content += '        </div>'
                     content += '        <div class="collapse" id="' + songname + '-detail">'
                     content += '            <hr>'
                     content += '            <h4>Info</h4>'
@@ -526,6 +502,92 @@ firebase.auth().onAuthStateChanged((user) => {
     }
 });
 
+function dismissNewMapNotification(musicID){
+    var updates = {}
+    updates[musicID] = "dismissed";
+    DB.ref('users/' + currentUser.uid + '/NewMapNotification').update(updates)
+}
+
+function getHistoryList(){
+    $("#game-history").html(""); // clean up histories
+
+    // DB.ref('users/'+currentUser.uid+'/friends').get().then(friends => {
+    //     friendUIDtoUsername = {}
+    //     if (!friends.exists()) var userAndFriendsID = [currentUser.uid]
+    //     else {
+    //         var userAndFriendsID = Object.keys(friends.val())
+    //         userAndFriendsID.push(currentUser.uid)
+    //     }
+    DB.ref('users').get().then(users => {
+        friendUIDtoUsername = {}
+        if (!Object.keys(users.val()[currentUser.uid]).includes("friends")) var userAndFriendsID = [currentUser.uid]
+        else {
+            var userAndFriendsID = Object.keys(users.val()[currentUser.uid].friends)
+            userAndFriendsID.push(currentUser.uid)
+        }
+
+        DB.ref('game_history').orderByChild("dateAndTimeUTC").get().then(histories => {
+            var historylist = ""
+            histories.forEach(history_snapshot => {
+                var history = history_snapshot.val()
+                if (userAndFriendsID.includes(history.userID)){
+                    var play_time = new Date(history.dateAndTimeUTC + 'Z');
+                    play_time = play_time.toString().split(' ')
+                    play_time = play_time[2] + ' ' + play_time[1] + ' ' + play_time[3] + ' ' + play_time[4];
+                    
+                    var historyCard = '';
+                    if (history.userID == currentUser.uid) historyCard += '<div class="card bg-info bg-gradient mb-3">'
+                    else historyCard += '<div class="card bg-light bg-gradient mb-3">'
+                    historyCard += '    <div class="card-body">'
+                    historyCard += '    <div class="row">'
+                    historyCard += '        <h4 class="card-title col-6">'+history.musicID+'</h4>'
+                    historyCard += '        <h5 class="card-text col-6" style="text-align: right"><strong>Score: '+history.score+'</strong></h5>'
+                    historyCard += '    </div>'
+                    historyCard += '    <p class="card-text">'
+                    historyCard += '        Perfect: '+history.spec.perfect+' Good: '+history.spec.good+' Miss: ' + history.spec.missed
+                    historyCard += '        </p>'
+                    if (history.userID == currentUser.uid){
+                        historyCard += '    <h6 class="card-subtitle mb-2 text-muted">you played at '+ play_time +'</h6>'
+                    }else{
+                        historyCard += '    <h6 class="card-subtitle mb-2 text-muted"><strong>'+ users.val()[history.userID].username +'</strong> played at '+ play_time +'</h6>'
+                    }
+                    historyCard += '    </div>'
+                    historyCard += '</div>'
+                    historylist = historyCard+historylist
+                }
+            })
+            $("#game-history").html(historylist);
+            
+        })
+    })
+}
+
+function updateHistoryCard(musicID, score, perfect, good, missed, dateAndTimeUTC, userID){
+    var play_time = new Date(dateAndTimeUTC + 'Z');
+    play_time = play_time.toString().split(' ')
+    play_time = play_time[2] + ' ' + play_time[1] + ' ' + play_time[3] + ' ' + play_time[4];
+    
+    var historyCard = '';
+    if (userID == currentUser.uid) historyCard += '<div class="card bg-light mb-3">'
+    else historyCard += '<div class="card mb-3">'
+    historyCard += '    <div class="card-body">'
+    historyCard += '    <div class="row">'
+    historyCard += '        <h4 class="card-title col-6">'+musicID+'</h4>'
+    historyCard += '        <h5 class="card-text col-6" style="text-align: right"><strong>Score: '+score+'</strong></h5>'
+    historyCard += '    </div>'
+    historyCard += '    <p class="card-text">'
+    historyCard += '        Perfect: '+perfect+' Good: '+good+' Miss: ' + missed
+    historyCard += '        </p>'
+    if (userID == currentUser.uid){
+        historyCard += '    <h6 class="card-subtitle mb-2 text-muted">you played at '+ play_time +'</h6>'
+    }else{
+        historyCard += '    <h6 class="card-subtitle mb-2 text-muted">you played at '+ play_time +'</h6>'
+    }
+    historyCard += '    </div>'
+    historyCard += '</div>'
+    $("#game-history").append(historyCard);
+}
+
 function postComment(musicID){
     var comment = $("#"+musicID+"-commentinput").val();
     DB.ref("songs/" + musicID + "/comments").push({
@@ -661,6 +723,8 @@ function newFriend(friend_username){
                 DB.ref('users/'+currentUser.uid+'/friends/'+friend_uid).set({
                     friend_time: getUTCDateAndTime()
                 })
+
+                // refresh friends list
                 getFriendsList()
             }
         })
@@ -674,6 +738,8 @@ function removeFriend(friend_uid){
             return
         }
         DB.ref('users/'+currentUser.uid+'/friends/'+friend_uid).remove()
+        
+        //refresh friends list
         getFriendsList()
     })
 }
@@ -695,8 +761,6 @@ function newScore(Uid, MusicID, Score, Perfect, Good, Missed, DateAndTime){
     });
 
     var historyID = refToGameHistory.key;
-    // update past 10 games history
-    // get past 10 games, append, then upload
     DB.ref('users/'+Uid).child('game_history').get().then((snapshot) => {
         if (snapshot.exists()){
             var history_log = snapshot.val();
@@ -710,6 +774,7 @@ function newScore(Uid, MusicID, Score, Perfect, Good, Missed, DateAndTime){
             })
         }
     });
+
 }
 
 // for test only
