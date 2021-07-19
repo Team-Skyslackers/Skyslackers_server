@@ -99,41 +99,41 @@
                     <!-- <svg class="bi me-2" width="40" height="32" role="img" aria-label="Bootstrap"><use xlink:href="#bootstrap"></use></svg> -->
                   </a>
         
-                    <ul class="nav col-12 col-lg-auto my-2 justify-content-center my-md-0 text-small">
-                        <li>
-                        <a href="#" class="section-button nav-link text-secondary" onclick="setSection('instruction-section')" id="instruction-section-button">
+                    <ul class="nav col-12 col-lg-auto my-2 justify-content-center my-md-0 text-small" style="text-align:center;">
+                        <li style="width: 32%; text-align: center;">
+                        <a href="#" class="section-button nav-link text-secondary" onclick="setSection('instruction-section')" id="instruction-section-button" style="padding-left: 0px;padding-right: 0px;">
                             <svg class="bi d-block mx-auto mb-1" width="24" height="24"><use xlink:href="#home"></use></svg>
                             Home
                         </a>
                         </li>
-                        <li>
-                        <a href="#" class="section-button nav-link text-white" onclick="setSection('dashboard-section')" id="dashboard-section-button">
+                        <li style="width: 32%; text-align: center;">
+                        <a href="#" class="section-button nav-link text-white" onclick="setSection('dashboard-section')" id="dashboard-section-button" style="padding-left: 0px;padding-right: 0px;">
                             <svg class="bi d-block mx-auto mb-1" width="24" height="24"><use xlink:href="#speedometer2"></use></svg>
-                            Activities
+                            Dashboard
                         </a>
                         </li>
-                        <li>
-                        <a href="#" class="section-button nav-link text-white" onclick="setSection('musicmaps-section')" id="musicmaps-section-button">
+                        <li style="width: 32%; text-align: center;">
+                        <a href="#" class="section-button nav-link text-white" onclick="setSection('musicmaps-section')" id="musicmaps-section-button" style="padding-left: 0px;padding-right: 0px;">
                             <svg class="bi d-block mx-auto mb-1" width="24" height="24"><use xlink:href="#table"></use></svg>
                             Maps
                         </a>
                         </li>
                     </ul>
-                    <ul class="nav col-12 col-lg-auto my-2 justify-content-center my-md-0 text-small">
-                        <li>
-                        <a href="#" class="section-button nav-link text-white" onclick="setSection('friends-section')" id="friends-section-button">
+                    <ul class="nav col-12 col-lg-auto my-2 justify-content-center my-md-0 text-small" style="text-align:center;">
+                        <li style="width: 32%; text-align: center;">
+                        <a href="#" class="section-button nav-link text-white" onclick="setSection('friends-section')" id="friends-section-button" style="padding-left: 0px;padding-right: 0px;">
                             <svg class="bi d-block mx-auto mb-1" width="24" height="24"><use xlink:href="#friends"></use></svg>
                             Friends
                         </a>
                         </li>
-                        <li>
-                        <a href="#" class="section-button nav-link text-white" onclick="setSection('leaderboard-section')" id="leaderboard-section-button">
+                        <li style="width: 32%; text-align: center;">
+                        <a href="#" class="section-button nav-link text-white" onclick="setSection('leaderboard-section')" id="leaderboard-section-button" style="padding-left: 0px;padding-right: 0px;">
                             <svg class="bi d-block mx-auto mb-1" width="24" height="24"><use xlink:href="#trophy"></use></svg>
                             Leaderboard
                         </a>
                         </li>
-                        <li>
-                        <a href="#" class="section-button nav-link text-white" onclick="setSection('profile-section')" id="profile-section-button">
+                        <li style="width: 32%; text-align: center;">
+                        <a href="#" class="section-button nav-link text-white" onclick="setSection('profile-section')" id="profile-section-button" style="padding-left: 0px;padding-right: 0px;">
                             <svg class="bi d-block mx-auto mb-1" width="24" height="24"><use xlink:href="#people-circle"></use></svg>
                             Profile
                         </a>
@@ -269,10 +269,6 @@
         <div class='container section d-none' id='friends-section'>
             <!-- <H2>Music Maps</H2> -->
             <h3 class="signin-reminder">Sign in to view friends!</h3>
-            <div class="input-group mb-3" id="friend-search">
-                <input type="text" class="form-control" placeholder="Search username..." aria-label="Username" id="friend-username-input">
-                <button class="btn btn-outline-primary" type="button" onclick="newFriend($('#friend-username-input').val())">Add friend</button>
-            </div>
             <div class='container' id="listOfFriends" style="padding: 0%;"></div>
         </div>
 
@@ -297,6 +293,7 @@
 
         <!-- leaderboard -->
         <div class="container section d-none" id="leaderboard-section">
+            <h3 class="signin-reminder">Sign in to view leaderboard!</h3>
             <div class="accordion" id="leaderboard-list"></div>
         </div>
 

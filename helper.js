@@ -307,7 +307,7 @@ firebase.auth().onAuthStateChanged((user) => {
                     // if have link then get button, otherwise no button
                     if (Object.keys(val).includes("storageLink")){
                         content += '            <div style="text-align:center;">'
-                        content += '            <button class="btn btn-info" style="margin-top: 6px; left: 50%; width: 80%" onclick="selectMusic(\'' + val.storageLink.mp3 + '\', \'' + val.storageLink.csv + '\')">Start Game</button>'
+                        content += '            <button class="btn btn-info" style="margin-top: 6px; left: 50%; width: 80%" onclick="selectMusic(\'' + val.storageLink.mp3 + '\', \'' + val.storageLink.csv + '\'); setSection(\'instruction-section\')">Start Game</button>'
                         content += '            </div>'
                     }
                     content += '        <div class="collapse" id="' + songname + '-detail">'
@@ -410,7 +410,7 @@ firebase.auth().onAuthStateChanged((user) => {
                     var newcard = '<div class="accordion-item">\
                                         <h2 class="accordion-header" id="' + songname + 'heading">\
                                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse'+songname+'" aria-expanded="false" aria-controls="collapse'+songname+'">\
-                                                '+songname+'\
+                                                <strong>'+songname+'</strong>\
                                             </button>\
                                         </h2>\
                                         <div id="collapse'+songname+'" class="accordion-collapse collapse" aria-labelledby="' + songname + 'heading" data-bs-parent="#leaderboard-list">\
@@ -443,7 +443,7 @@ firebase.auth().onAuthStateChanged((user) => {
                         }
                         
                         if (historyDetail.userID == currentUser.uid){
-                            newcard += '        <div class="card mb-3 bg-light">'
+                            newcard += '        <div class="card mb-3 bg-info">'
                         }else{
                             newcard += '        <div class="card mb-3">'
                         }
@@ -491,6 +491,7 @@ firebase.auth().onAuthStateChanged((user) => {
         $("#profile-username").val("");
         $("#profile-newpassword").val("");
         $("#profile-confirmpassword").val("");
+        $("#listOfFriends").html("");
 
 
 
@@ -676,7 +677,11 @@ function selectMusic(mp3URL, csvURL){
 
 function getFriendsList(){
     DB.ref('users/' + currentUser.uid).get().then(user => {
-        $("#listOfFriends").html("");
+        $("#listOfFriends").html('\
+            <div class="input-group mb-3" id="friend-search">\
+                <input type="text" class="form-control" placeholder="Search username..." aria-label="Username" id="friend-username-input">\
+                <button class="btn btn-outline-primary" type="button" onclick="newFriend($(\'#friend-username-input\').val())">Add friend</button>\
+            </div>');
         if (!user.exists() || !Object.keys(user.val()).includes("friends")) {
             $("#listOfFriends").html("No friends yet. Add some friends now!")
             return
