@@ -251,11 +251,12 @@ firebase.auth().onAuthStateChanged((user) => {
         // get friends list
         getFriendsList()
 
-        // retrieve a list of playable musics from the server
+        // get map list
+        getMaps();
+
+        // get notification for new maps, get leaderboard
         DB.ref("songs").get().then((snapshot) => {
             if (!snapshot.exists()) return;
-
-            $('#listOfMusic').html("");
 
             snapshot.forEach(function(data){
                 var val = data.val();
@@ -285,117 +286,6 @@ firebase.auth().onAuthStateChanged((user) => {
                         }
                     }
                 })
-
-
-                // update list of maps
-                DB.ref('users/' + val.details.author).child('username').get().then(username => {
-                    var content = '';
-                    content += '<div class="card mb-3">'
-                    content += '    <div class="card-body">'
-                    content += '        <div class="row">'
-                    content += '            <h4 class="card-title col">'+songname+'</h4>'
-                    content += '            <h6 class="card-text col">Difficulty: ' + val.difficulty + '</h6>'
-                    content += '        </div>'
-                    content += '        <div class="row">'
-                    content += '            <div class="col-8">'
-                    content += '                <p class="card-text">By:\n'+username.val()+'</p>'
-                    content += '            </div>'
-                    content += '            <div class="col-4">'
-                    content += '                <a href="#' + songname + '-detail" class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#' + songname + '-detail" aria-expanded="false" aria-controls="' + val.musicID + '-detail">Detail</a>'
-                    content += '            </div>'
-                    content += '        </div>'
-                    // if have link then get button, otherwise no button
-                    if (Object.keys(val).includes("storageLink")){
-                        content += '            <div style="text-align:center;">'
-                        content += '            <button class="btn btn-info" style="margin-top: 6px; left: 50%; width: 80%" onclick="selectMusic(\'' + val.storageLink.mp3 + '\', \'' + val.storageLink.csv + '\'); setSection(\'instruction-section\')">Start Game</button>'
-                        content += '            </div>'
-                    }
-                    content += '        <div class="collapse" id="' + songname + '-detail">'
-                    content += '            <hr>'
-                    content += '            <h4>Info</h4>'
-                    // info about the map
-                    var creation_time = new Date(val.details.creationTime + 'Z');
-                    creation_time = creation_time.toString().split(' ')
-                    creation_time = creation_time[2] + ' ' + creation_time[1] + ' ' + creation_time[3] + ' ' + creation_time[4];
-                    content += '            <h6>Creator: '+ username.val() +'</h6>'
-                    content += '            <h6>Creation time: '+ creation_time +'</h6>'
-                    content += '            <h6 id="'+ songname +'-timesPlayed">Played: many times</h6>' // needs update separately
-
-                    content += '            <h4>Comments</h4>'
-                    content += '            <div class="overflow-auto" style="padding: 0px; max-height: 50vh" id="'+songname+'-commentSection">Comments</div>'
-                    content += '            <div class="mb-3">'
-                    content += '                <label for="' + songname + '-commentinput" class="form-label">New comment</label>'
-                    content += '                <input type="text" class="form-control" id="'+songname+'-commentinput">'
-                    content += '            </div>'
-                    content += '            <button class="btn btn-primary mb-3" onclick="postComment(\''+songname+'\')">Post comment</button>'
-                    content += '        </div>'
-                    content += '    </div>'
-                    content += '</div>'
-                    $('#listOfMusic').append(content);
-
-                    // update number of times played
-                    DB.ref("game_history").orderByChild("musicID").equalTo(songname).get().then(history =>{
-                        if (history.exists()){
-                            $("#"+songname+"-timesPlayed").text("Played: "+Object.keys(history.val()).length +" time(s)")
-                        }else{
-                            $("#"+songname+"-timesPlayed").text("Has not been played yet")
-                        }
-                    })
-
-                    // update comment section
-                    DB.ref('songs/' + songname + "/comments").on('value', comments =>{
-                        var allUIDdisplayed = []; // for updating UID with username
-                        var commentSection = $("#" + songname + "-commentSection");
-                        
-                        // empty comment section before each refresh
-                        commentSection.html("");
-
-                        // reset if no comment
-                        if (!comments.exists()){
-                            commentSection.html("no comment yet...")
-                            return
-                        }
-
-                        // show as cards
-                        var commentCard = ""
-                        for (const commentID in comments.val()){
-                            comment = comments.val()[commentID];
-                            allUIDdisplayed.push(comment.userID);
-                            var temp_commentCard = '';
-                            
-                            //highlight comment if comment belongs to the user
-                            if (comment.userID = currentUser.uid){
-                                temp_commentCard += '            <div class="card bg-light card-body mb-3">'
-                            }else{
-                                temp_commentCard += '            <div class="card card-body mb-3">'
-                            }
-                            
-                            temp_commentCard += '                <h4 class="card-text">'+comment.content+'</h4>'
-                            temp_commentCard += '                <div class="row">'
-                            temp_commentCard += '                    <h6 class="col-4 card-subtitle ' + comment.userID + '-username">'+comment.userID+'</h6>'
-
-                            var comment_time = new Date(comment.dateAndTimeUTC + 'Z');
-                            comment_time = comment_time.toString().split(' ')
-                            comment_time = comment_time[2] + ' ' + comment_time[1] + ' ' + comment_time[3] + ' ' + comment_time[4];
-
-                            temp_commentCard += '                    <h6 class="col-8 card-text text-muted">'+comment_time+'</h6>'
-                            temp_commentCard += '                </div>'
-
-                            temp_commentCard += '            </div>'
-                            commentCard = temp_commentCard + commentCard;
-                        }
-
-                        commentSection.append(commentCard);
-
-                        // replace UID with username
-                        for (const UID in allUIDdisplayed){
-                            DB.ref('users/' + allUIDdisplayed[UID] + '/username').get().then(username => {
-                                $("." + allUIDdisplayed[UID] + "-username").text(username.val());
-                            })
-                        }
-
-                    })
-                })
             })
 
             // retrieve leaderboard
@@ -404,7 +294,7 @@ firebase.auth().onAuthStateChanged((user) => {
             snapshot.forEach(function(song){
                 var songname = song.key;
                 var allUIDdisplayed = []; // for updating UID with username
-                DB.ref("game_history").orderByChild("musicID").equalTo(songname).get().then(history =>{
+                DB.ref("game_history").child(songname).get().then(history =>{
                     if (!history.exists()) return;
                     
                     var newcard = '<div class="accordion-item">\
@@ -503,6 +393,149 @@ firebase.auth().onAuthStateChanged((user) => {
     }
 });
 
+function getMaps(Search = "", Difficulty = ""){
+    console.log(Search + ' ' + Difficulty)
+    DB.ref("songs").get().then((snapshot) => {
+        if (!snapshot.exists()) return;
+
+        $('#listOfMusic').html('\
+        <div class="input-group mb-3">\
+            <input type="text" id="searchMapKeywords" class="form-control" placeholder="Keyword" aria-label="Search">\
+            <select class="form-select" id="selectMapDifficulty" aria-label="Select difficulty">\
+                <option selected value="">Difficulty</option>\
+                <option value="easy">Easy</option>\
+                <option value="normal">Normal</option>\
+                <option value="hard">Hard</option>\
+            </select>\
+            <button class="btn btn-outline-secondary" type="button" onclick="getMaps($(\'#searchMapKeywords\').val(), $(\'#selectMapDifficulty\').val())">Search</button>\
+        </div>');
+        snapshot.forEach(function(data){
+            var val = data.val();
+            var songname = data.key;
+
+            // filter by difficulty
+            if (Difficulty != "" && Difficulty != val.difficulty) return;
+
+            // update list of maps
+            DB.ref('users/' + val.details.author).child('username').get().then(username => {
+
+                // filter by keyword
+                // discard if both song title and username does not include the keyword
+                if (!songname.includes(Search) && !username.val().includes(Search)) return;
+                
+                var content = '';
+                content += '<div class="card mb-3">'
+                content += '    <div class="card-body">'
+                content += '        <div class="row">'
+                content += '            <h4 class="card-title col">'+songname+'</h4>'
+                content += '            <h6 class="card-text col">Difficulty: ' + val.difficulty + '</h6>'
+                content += '        </div>'
+                content += '        <div class="row">'
+                content += '            <div class="col-8">'
+                content += '                <p class="card-text">By:\n'+username.val()+'</p>'
+                content += '            </div>'
+                content += '            <div class="col-4">'
+                content += '                <a href="#' + songname.replace(' ', '_') + '_detail" class="btn btn-primary collapsed" data-bs-toggle="collapse" aria-expanded="false" aria-controls="' + songname.replace(' ', '_') + '_detail">Detail</a>'
+                content += '            </div>'
+                content += '        </div>'
+                content += '        <div style="text-align:center; margin-top: 6px;">'
+                // if have link then get button, otherwise no button
+                if (Object.keys(val).includes("storageLink")){
+                    content += '            <button class="btn btn-info" style="left: 50%; width: 80%; padding: 6px;" onclick="selectMusic(\'' + val.storageLink.mp3 + '\', \'' + val.storageLink.csv + '\'); setSection(\'instruction-section\')">Start Game</button>'
+                }else{
+                    content += '            <p style="padding-top: 16px;">Please select in game</p>'
+                }
+                content += '        </div>'
+                content += '        <div class="collapse" id="' + songname.replace(' ', '_') + '_detail">'
+                content += '            <hr>'
+                content += '            <h4>Info</h4>'
+                // info about the map
+                var creation_time = new Date(val.details.creationTime + 'Z');
+                creation_time = creation_time.toString().split(' ')
+                creation_time = creation_time[2] + ' ' + creation_time[1] + ' ' + creation_time[3] + ' ' + creation_time[4];
+                content += '            <h6>Creator: '+ username.val() +'</h6>'
+                content += '            <h6>Creation time: '+ creation_time +'</h6>'
+                content += '            <h6 id="'+ songname +'-timesPlayed">Played: many times</h6>' // needs update separately
+
+                content += '            <h4>Comments</h4>'
+                content += '            <div class="overflow-auto" style="padding: 0px; max-height: 50vh" id="'+songname+'-commentSection">Comments</div>'
+                content += '            <div class="mb-3">'
+                content += '                <label for="' + songname + '-commentinput" class="form-label">New comment</label>'
+                content += '                <input type="text" class="form-control" id="'+songname+'-commentinput">'
+                content += '            </div>'
+                content += '            <button class="btn btn-primary mb-3" onclick="postComment(\''+songname+'\')">Post comment</button>'
+                content += '        </div>'
+                content += '    </div>'
+                content += '</div>'
+                $('#listOfMusic').append(content);
+
+                // update number of times played
+                DB.ref("game_history").child(songname).get().then(history =>{
+                    if (history.exists()){
+                        $("#"+songname+"-timesPlayed").text("Played: "+Object.keys(history.val()).length +" time(s)")
+                    }else{
+                        $("#"+songname+"-timesPlayed").text("Has not been played yet")
+                    }
+                })
+
+                // update comment section
+                DB.ref('songs/' + songname + "/comments").on('value', comments =>{
+                    var allUIDdisplayed = []; // for updating UID with username
+                    var commentSection = $("#" + songname + "-commentSection");
+                    
+                    // empty comment section before each refresh
+                    commentSection.html("");
+
+                    // reset if no comment
+                    if (!comments.exists()){
+                        commentSection.html("no comment yet...")
+                        return
+                    }
+
+                    // show as cards
+                    var commentCard = ""
+                    for (const commentID in comments.val()){
+                        comment = comments.val()[commentID];
+                        allUIDdisplayed.push(comment.userID);
+                        var temp_commentCard = '';
+                        
+                        //highlight comment if comment belongs to the user
+                        if (comment.userID = currentUser.uid){
+                            temp_commentCard += '            <div class="card bg-light card-body mb-3">'
+                        }else{
+                            temp_commentCard += '            <div class="card card-body mb-3">'
+                        }
+                        
+                        temp_commentCard += '                <h4 class="card-text">'+comment.content+'</h4>'
+                        temp_commentCard += '                <div class="row">'
+                        temp_commentCard += '                    <h6 class="col-4 card-subtitle ' + comment.userID + '-username">'+comment.userID+'</h6>'
+
+                        var comment_time = new Date(comment.dateAndTimeUTC + 'Z');
+                        comment_time = comment_time.toString().split(' ')
+                        comment_time = comment_time[2] + ' ' + comment_time[1] + ' ' + comment_time[3] + ' ' + comment_time[4];
+
+                        temp_commentCard += '                    <h6 class="col-8 card-text text-muted">'+comment_time+'</h6>'
+                        temp_commentCard += '                </div>'
+
+                        temp_commentCard += '            </div>'
+                        commentCard = temp_commentCard + commentCard;
+                    }
+
+                    commentSection.append(commentCard);
+
+                    // replace UID with username
+                    for (const UID in allUIDdisplayed){
+                        DB.ref('users/' + allUIDdisplayed[UID] + '/username').get().then(username => {
+                            $("." + allUIDdisplayed[UID] + "-username").text(username.val());
+                        })
+                    }
+
+                })
+            })
+        })
+    })
+}
+
 function dismissNewMapNotification(musicID){
     var updates = {}
     updates[musicID] = "dismissed";
@@ -527,7 +560,7 @@ function getHistoryList(){
             userAndFriendsID.push(currentUser.uid)
         }
 
-        DB.ref('game_history').orderByChild("dateAndTimeUTC").get().then(histories => {
+        DB.ref('game_history').get().then(histories => {
             var historylist = ""
             histories.forEach(history_snapshot => {
                 var history = history_snapshot.val()
