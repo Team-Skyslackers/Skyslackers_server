@@ -294,7 +294,7 @@ firebase.auth().onAuthStateChanged((user) => {
             snapshot.forEach(function(song){
                 var songname = song.key;
                 var allUIDdisplayed = []; // for updating UID with username
-                DB.ref("game_history").child(songname).get().then(history =>{
+                DB.ref("game_history").orderByChild("musicID").equalTo(songname).get().then(history =>{
                     if (!history.exists()) return;
                     
                     var newcard = '<div class="accordion-item">\
