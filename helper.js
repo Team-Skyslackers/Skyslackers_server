@@ -263,14 +263,14 @@ firebase.auth().onAuthStateChanged((user) => {
                 var songname = data.key;
 
                 // update dashboard - new maps
-                DB.ref('users/' + currentUser.uid + '/NewMapNotification/' + songname).get().then(notification_state => {
+                DB.ref('users/' + currentUser.uid + '/NewMapNotification').child(songname).get().then(notification_state => {
                     if (!notification_state.exists()){
                         var creation_time = new Date(val.details.creationTime + 'Z');
                         var diff = Math.abs(new Date() - creation_time) / (1000*60*60*24); // in days
                         if (diff <= 7){ // uploaded within 7 days
                             // add to recent uploads
                             var temp = "";
-                            temp += '<div class="card bg-success bg-gradient mb-3" id="'+songname+'-new-map-notification">'
+                            temp += '<div class="card bg-success bg-gradient mb-3" id="'+songname.split(' ').join('_')+'-new-map-notification">'
                             temp += '    <div class="card-body row">'
                             temp += '    <div class="col-8">'
                             temp += '       <h4 class="card-title">New map!</h4>'
@@ -278,7 +278,7 @@ firebase.auth().onAuthStateChanged((user) => {
                             temp += '       <h6 class="card-text">Published '+Math.floor(diff)+' day(s) ago</h6>'
                             temp += '    </div>'
                             temp += '    <div class="col-4">'
-                            temp += '       <button class="btn btn-secondary" onclick="$(\'#'+songname+'-new-map-notification\').fadeOut(); dismissNewMapNotification(\''+songname+'\')">dismiss</button>'
+                            temp += '       <button class="btn btn-secondary" onclick="$(\'#'+songname.split(' ').join('_')+'-new-map-notification\').fadeOut(); dismissNewMapNotification(\''+songname.split(' ').join('_')+'\')">dismiss</button>'
                             temp += '    </div>'
                             temp += '    </div>'
                             temp += '</div>'
@@ -298,12 +298,12 @@ firebase.auth().onAuthStateChanged((user) => {
                     if (!history.exists()) return;
                     
                     var newcard = '<div class="accordion-item">\
-                                        <h2 class="accordion-header" id="' + songname + 'heading">\
-                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse'+songname+'" aria-expanded="false" aria-controls="collapse'+songname+'">\
+                                        <h2 class="accordion-header" id="' + songname.split(' ').join('_') + 'heading">\
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse'+songname.split(' ').join('_')+'" aria-expanded="false" aria-controls="collapse'+songname.split(' ').join('_')+'">\
                                                 <strong>'+songname+'</strong>\
                                             </button>\
                                         </h2>\
-                                        <div id="collapse'+songname+'" class="accordion-collapse collapse" aria-labelledby="' + songname + 'heading" data-bs-parent="#leaderboard-list">\
+                                        <div id="collapse'+songname.split(' ').join('_')+'" class="accordion-collapse collapse" aria-labelledby="' + songname.split(' ').join('_') + 'heading" data-bs-parent="#leaderboard-list">\
                                             <div class="accordion-body">';
     
                     var historyList = Object.values(history.val());
@@ -435,7 +435,7 @@ function getMaps(Search = "", Difficulty = ""){
                 content += '                <p class="card-text">By:\n'+username.val()+'</p>'
                 content += '            </div>'
                 content += '            <div class="col-4">'
-                content += '                <a href="#' + songname.replace(' ', '_') + '_detail" class="btn btn-primary collapsed" data-bs-toggle="collapse" aria-expanded="false" aria-controls="' + songname.replace(' ', '_') + '_detail">Detail</a>'
+                content += '                <a href="#' + songname.split(' ').join('_') + '_detail" class="btn btn-primary collapsed" data-bs-toggle="collapse" aria-expanded="false" aria-controls="' + songname.split(' ').join('_') + '_detail">Detail</a>'
                 content += '            </div>'
                 content += '        </div>'
                 content += '        <div style="text-align:center; margin-top: 6px;">'
@@ -446,7 +446,7 @@ function getMaps(Search = "", Difficulty = ""){
                     content += '            <p style="padding-top: 16px;">Please select in game</p>'
                 }
                 content += '        </div>'
-                content += '        <div class="collapse" id="' + songname.replace(' ', '_') + '_detail">'
+                content += '        <div class="collapse" id="' + songname.split(' ').join('_') + '_detail">'
                 content += '            <hr>'
                 content += '            <h4>Info</h4>'
                 // info about the map
@@ -455,13 +455,13 @@ function getMaps(Search = "", Difficulty = ""){
                 creation_time = creation_time[2] + ' ' + creation_time[1] + ' ' + creation_time[3] + ' ' + creation_time[4];
                 content += '            <h6>Creator: '+ username.val() +'</h6>'
                 content += '            <h6>Creation time: '+ creation_time +'</h6>'
-                content += '            <h6 id="'+ songname +'-timesPlayed">Played: many times</h6>' // needs update separately
+                content += '            <h6 id="'+ songname.split(' ').join('_') +'-timesPlayed">Played: many times</h6>' // needs update separately
 
                 content += '            <h4>Comments</h4>'
-                content += '            <div class="overflow-auto" style="padding: 0px; max-height: 50vh" id="'+songname+'-commentSection">Comments</div>'
+                content += '            <div class="overflow-auto" style="padding: 0px; max-height: 50vh" id="'+songname.split(' ').join('_')+'-commentSection">Comments</div>'
                 content += '            <div class="mb-3">'
-                content += '                <label for="' + songname + '-commentinput" class="form-label">New comment</label>'
-                content += '                <input type="text" class="form-control" id="'+songname+'-commentinput">'
+                content += '                <label for="' + songname.split(' ').join('_') + '-commentinput" class="form-label">New comment</label>'
+                content += '                <input type="text" class="form-control" id="'+songname.split(' ').join('_')+'-commentinput">'
                 content += '            </div>'
                 content += '            <button class="btn btn-primary mb-3" onclick="postComment(\''+songname+'\')">Post comment</button>'
                 content += '        </div>'
@@ -472,16 +472,16 @@ function getMaps(Search = "", Difficulty = ""){
                 // update number of times played
                 DB.ref("game_history").child(songname).get().then(history =>{
                     if (history.exists()){
-                        $("#"+songname+"-timesPlayed").text("Played: "+Object.keys(history.val()).length +" time(s)")
+                        $("#"+songname.split(' ').join('_')+"-timesPlayed").text("Played: "+Object.keys(history.val()).length +" time(s)")
                     }else{
-                        $("#"+songname+"-timesPlayed").text("Has not been played yet")
+                        $("#"+songname.split(' ').join('_')+"-timesPlayed").text("Has not been played yet")
                     }
                 })
 
                 // update comment section
                 DB.ref('songs/' + songname + "/comments").on('value', comments =>{
                     var allUIDdisplayed = []; // for updating UID with username
-                    var commentSection = $("#" + songname + "-commentSection");
+                    var commentSection = $("#" + songname.split(' ').join('_') + "-commentSection");
                     
                     // empty comment section before each refresh
                     commentSection.html("");
