@@ -394,7 +394,6 @@ firebase.auth().onAuthStateChanged((user) => {
 });
 
 function getMaps(Search = "", Difficulty = ""){
-    console.log(Search + ' ' + Difficulty)
     DB.ref("songs").get().then((snapshot) => {
         if (!snapshot.exists()) return;
 
@@ -428,14 +427,14 @@ function getMaps(Search = "", Difficulty = ""){
                 content += '    <div class="card-body">'
                 content += '        <div class="row">'
                 content += '            <h4 class="card-title col">'+songname+'</h4>'
-                content += '            <h6 class="card-text col">Difficulty: ' + val.difficulty + '</h6>'
+                content += '            <h6 class="card-text col" style="text-align: right">Difficulty: ' + val.difficulty + '</h6>'
                 content += '        </div>'
                 content += '        <div class="row">'
                 content += '            <div class="col-8">'
                 content += '                <p class="card-text">By:\n'+username.val()+'</p>'
                 content += '            </div>'
                 content += '            <div class="col-4">'
-                content += '                <a href="#' + songname.split(' ').join('_') + '_detail" class="btn btn-primary collapsed" data-bs-toggle="collapse" aria-expanded="false" aria-controls="' + songname.split(' ').join('_') + '_detail">Detail</a>'
+                content += '                <a href="#' + songname.split(' ').join('_') + '_detail" class="btn btn-primary collapsed" data-bs-toggle="collapse" aria-expanded="false" aria-controls="' + songname.split(' ').join('_') + '_detail" style="width: 100%;">Detail</a>'
                 content += '            </div>'
                 content += '        </div>'
                 content += '        <div style="text-align:center; margin-top: 6px;">'
@@ -448,7 +447,7 @@ function getMaps(Search = "", Difficulty = ""){
                 content += '        </div>'
                 content += '        <div class="collapse" id="' + songname.split(' ').join('_') + '_detail">'
                 content += '            <hr>'
-                content += '            <h4>Info</h4>'
+                // content += '            <h4>Info</h4>'
                 // info about the map
                 var creation_time = new Date(val.details.creationTime + 'Z');
                 creation_time = creation_time.toString().split(' ')
@@ -457,13 +456,13 @@ function getMaps(Search = "", Difficulty = ""){
                 content += '            <h6>Creation time: '+ creation_time +'</h6>'
                 content += '            <h6 id="'+ songname.split(' ').join('_') +'-timesPlayed">Played: many times</h6>' // needs update separately
 
+                content += '            <hr>'
                 content += '            <h4>Comments</h4>'
-                content += '            <div class="overflow-auto" style="padding: 0px; max-height: 50vh" id="'+songname.split(' ').join('_')+'-commentSection">Comments</div>'
-                content += '            <div class="mb-3">'
-                content += '                <label for="' + songname.split(' ').join('_') + '-commentinput" class="form-label">New comment</label>'
-                content += '                <input type="text" class="form-control" id="'+songname.split(' ').join('_')+'-commentinput">'
+                content += '            <div class="overflow-auto mb-3" style="padding: 0px; max-height: 50vh" id="'+songname.split(' ').join('_')+'-commentSection">Comments</div>'
+                content += '            <div class="input-group mb-3">'
+                content += '                <input type="text" class="form-control" placeholder="New comment..." id="'+songname.split(' ').join('_')+'-commentinput">'
+                content += '                <button class="btn btn-secondary" onclick="postComment(\''+songname+'\')">Post comment</button>'
                 content += '            </div>'
-                content += '            <button class="btn btn-primary mb-3" onclick="postComment(\''+songname+'\')">Post comment</button>'
                 content += '        </div>'
                 content += '    </div>'
                 content += '</div>'
