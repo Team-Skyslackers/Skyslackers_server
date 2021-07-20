@@ -650,6 +650,7 @@ function getHistoryList(){
 
 function postComment(musicID){
     var comment = $("#"+musicID.split(' ').join('_')+"-commentinput").val();
+    if (comment == '') return
     DB.ref("songs/" + musicID + "/comments").push({
         dateAndTimeUTC: getUTCDateAndTime(),
         content: comment,
