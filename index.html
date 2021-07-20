@@ -144,38 +144,20 @@
             </div>
             <div class="px-3 py-2 border-bottom mb-3">
                 <div class="container d-flex flex-wrap justify-content-center">
-                    <!-- <form class="col-12 col-lg-auto mb-2 mb-lg-0 me-lg-auto">
-                        <input type="search" class="form-control" placeholder="Search username..." aria-label="Search">
-                    </form> -->
-        
                     <div class="text-end">
                         <button type="button" onclick="authState('signin')" id="openSigninPage" class="auth btn btn-light text-dark me-2">Sign in</button>
                         <button type="button" onclick="authState('registration')" id="openRegistrationPage" class="auth btn btn-primary">Sign-up</button>
-                        <!-- <div class="auth" id="signout-form">
-                            <div class="row">
-                                <div class="col-sm-6" style="background-color:yellow;">
-                                    <p id="welcome-text">Hi, unknown user.</p>
-                                </div>
-                                <div class="col-sm-6" style="background-color:pink;">
-                                    <button type="button" onclick="SignOut()" id="signout-button" class="btn btn-primary">Sign out</button>
-                                </div>
-                            </div>
-
-                            <p id="welcome-text">Hi, unknown user.</p>
-                            <button type="button" onclick="SignOut()" id="signout-button" class="btn btn-primary">Sign out</button>
-                        </div> -->
                     </div>
                 </div>
 
-                <div class="auth row d-none" id="signout-form">
+                <div class="auth d-none" id="signout-form">
+                    <p id="welcome-text" style="text-align: center; margin-bottom: 0;">Loading...</p>
+                    <!-- <div class="col">
+                    </div>
                     <div class="col">
                     </div>
                     <div class="col">
-                        <p id="welcome-text" style="text-align: center; height: 24px;">Hi, unknown user.</p>
-                    </div>
-                    <div class="col">
-                        <button type="button" onclick="SignOut()" id="signout-button" class="btn btn-primary">Sign out</button>
-                    </div>
+                    </div> -->
                 </div>
             </div>
           </header>
@@ -216,7 +198,7 @@
             <div class="card card-body"><form>
                 <div class="mb-3">
                     <label for="inputRegUsername" class="form-label">Username</label>
-                    <input type="text" class="form-control" id="inputRegUsername">
+                    <input type="text" class="form-control" id="inputRegUsername" maxlength="20" pattern="[A-Za-z0-9]">
                   </div>
                 <div class="mb-3">
                   <label for="inputRegEmail" class="form-label">Email address</label>
@@ -230,10 +212,6 @@
                   <label for="confirmRegPassword" class="form-label">Confirm Password</label>
                   <input type="password" class="form-control" id="confirmRegPassword">
                 </div>
-                <!-- <div class="mb-3 form-check">
-                  <input type="checkbox" class="form-check-input" id="exampleCheck1">
-                  <label class="form-check-label" for="exampleCheck1">Check me out</label>
-                </div> -->
                 <div class="d-grid gap-2">
                     <button type="button" id="register-button" class="btn btn-warning" 
                         onclick="RegisterUser($('#inputRegUsername').val(), $('#inputRegEmail').val(), $('#inputRegPassword').val(), $('#confirmRegPassword').val())">
@@ -278,17 +256,6 @@
             <h3 class="signin-reminder">Sign in to view dashboard!</h3>
             <div class="container" id="new-maps-notification" style="padding: 0%;"></div>
             <div class="container" id="game-history" style="padding: 0%;"></div>
-            <!-- <div class="card">
-                <div class="card-body">
-                  <h4 class="card-title">Music name</h5>
-                  <p class="card-text">
-                      <strong>Score: ****</strong><br>
-                      Perfect: *** Good: *** Miss: ***
-                    </p>
-                  <h6 class="card-subtitle mb-2 text-muted">you played at 13/07/2021 10:02</h6>
-                  <a href="#" class="card-link">View music</a>
-                </div>
-            </div> -->
         </div>
 
         <!-- leaderboard -->
@@ -299,40 +266,33 @@
 
         <!-- user profile -->
         <div class="container section d-none" id="profile-section">
-            <div class="mb-3">
-                <label for="profile-username" class="form-label">Username</label>
-                <input type="text" class="form-control" id="profile-username">
+            <h3 class="signin-reminder">Sign in to edit profile!</h3>
+            <div class="d-none" id="profile-page">
+                <div class="mb-3">
+                    <label for="profile-username" class="form-label">Username</label>
+                    <input type="text" class="form-control" id="profile-username" maxlength="20">
+                </div>
+                <div class="mb-3">
+                    <label for="profile-newpassword" class="form-label">New password</label>
+                    <input type="password" class="form-control" id="profile-newpassword">
+                </div>
+                <div class="mb-3">
+                    <label for="profile-confirmpassword" class="form-label">Confirm password</label>
+                    <input type="password" class="form-control" id="profile-confirmpassword">
+                </div>
+                <div class="d-grid gap-2">
+                    <button type="button" id="profile-save" class="btn btn-primary" 
+                        onclick="ProfileSave($('#profile-username').val(), $('#profile-newpassword').val(), $('#profile-confirmpassword').val())">
+                        Save
+                    </button>
+                    <button type="button" id="profile-resetPasswordViaEmail" class="btn btn-warning" 
+                        onclick="ResetPasswordViaEmail()">
+                        Reset password(via Email)
+                    </button>
+                    <button type="button" onclick="SignOut(); setSection('instruction-section')" id="signout-button" class="btn btn-secondary">Sign out</button>
+                </div>
             </div>
-            <div class="mb-3">
-                <label for="profile-newpassword" class="form-label">New password</label>
-                <input type="password" class="form-control" id="profile-newpassword">
-            </div>
-            <div class="mb-3">
-                <label for="profile-confirmpassword" class="form-label">Confirm password</label>
-                <input type="password" class="form-control" id="profile-confirmpassword">
-            </div>
-            <!-- <div class="mb-3">
-              <label for="inputRegPassword" class="form-label">Password</label>
-              <input type="password" class="form-control" id="inputRegPassword">
-            </div>
-            <div class="mb-3">
-              <label for="confirmRegPassword" class="form-label">Confirm Password</label>
-              <input type="password" class="form-control" id="confirmRegPassword">
-            </div> -->
-            <div class="d-grid gap-2">
-                <button type="button" id="profile-save" class="btn btn-primary" 
-                    onclick="ProfileSave($('#profile-username').val(), $('#profile-newpassword').val(), $('#profile-confirmpassword').val())">
-                    Save
-                </button>
-                <button type="button" id="profile-resetPasswordViaEmail" class="btn btn-warning" 
-                    onclick="ResetPasswordViaEmail()">
-                    Reset password(via Email)
-                </button>
-                <!-- <button type="button" id="hide-register-button" class="btn btn-primary" 
-                    onclick=" $('#signin-form').removeClass('d-none'); $('#registration-form').addClass('d-none'); ">
-                    Already have an account?
-                </button> -->
-            </div>
+            
         </div>
 
         <!-- testing -->

@@ -56,12 +56,8 @@ function RegisterUser(username, email, password, confirmPassword){
         alert("Confirm password does not match.");
         return
     }
-    if (username == ""){
-        alert("Username cannot be empty.");
-        return
-    }
-    if (username.includes("@")){
-        alert("Username cannot be email address.");
+    if (username.length<3 || username.includes('@') || username.includes(' ')){
+        alert("Invalid username.");
         return
     }
     DB.ref('users').orderByChild("username").equalTo(username).get().then(snapshot => {
@@ -170,8 +166,8 @@ function ProfileSave(newUsername, newPassword, confirmNewPassword){
     }
 
     // check format
-    if (newUsername == "" || newUsername.includes('@')){
-        alert("Please check username format\nCannot be empty or include @")
+    if (newUsername.length < 3 || newUsername.includes('@') || newUsername.includes(' ')){
+        alert("Invalid username")
         return
     }
 
@@ -219,6 +215,9 @@ firebase.auth().onAuthStateChanged((user) => {
             lastLoginDateAndTimeUTC: getUTCDateAndTime()
         });
 
+        // empty sign in forms
+        $("input").val("");
+
         // if no username then set default username to its email address
         DB.ref('users/'+user.uid).get().then(snapshot => {
             if (!snapshot.child('username').exists()){
@@ -259,6 +258,7 @@ firebase.auth().onAuthStateChanged((user) => {
 
         $(".auth").addClass("d-none");
         $("#signout-form").removeClass("d-none");
+        $("#profile-page").removeClass("d-none");
 
         console.log(user.email + " has signed in");
         // ...
@@ -285,6 +285,7 @@ firebase.auth().onAuthStateChanged((user) => {
         $(".auth").addClass("d-none");
         $("#openSigninPage").removeClass("d-none");
         $("#openRegistrationPage").removeClass("d-none");
+        $("#profile-page").addClass("d-none");
 
         console.log("No user signed in")
     }
@@ -307,7 +308,7 @@ function getLeaderboard(){
                         // add to recent uploads
                         var temp = "";
                         temp += '\
-                        <div class="card bg-success bg-gradient mb-3" id="'+songname.split(' ').join('_')+'-new-map-notification">\
+                        <div class="card bg-gradient mb-3" id="'+songname.split(' ').join('_')+'-new-map-notification" style="background-color: LightSkyBlue">\
                             <div class="card-body row">\
                             <div class="col-8">\
                                <h4 class="card-title">New map!</h4>\
@@ -373,21 +374,22 @@ function getLeaderboard(){
                     }
                     
                     if (historyDetail.userID == currentUser.uid){
-                        newcard += '        <div class="card mb-3 bg-info">'
+                        newcard += '        <div class="card mb-3 bg-gradient" style="background-color: AliceBlue">'
                     }else{
-                        newcard += '        <div class="card mb-3">'
+                        newcard += '        <div class="card mb-3 bg-light">'
                     }
                     newcard += '            <div class="card-body">\
                                                 <div class="row">'
                     
                     if (leaderboard_rank == 1){ // add gold star for No.1 user
                     newcard += '                    <h4 class="col-4 card-title">No.'+leaderboard_rank+'<span style="color:Gold">&#9733;</span></h4>'
+                    newcard += '                    <h4 class="col-8 card-title ' + historyDetail.userID + '-username" style="color: Goldenrod; text-align: right">'+historyDetail.userID+'</h4>'
                     $("#" + songname.split(' ').join('_') + '_' + historyDetail.userID + '_score').css("color", "Goldenrod")
                     }else{
                     newcard += '                    <h4 class="col-4 card-title">No.'+leaderboard_rank+'</h4>'
+                    newcard += '                    <h4 class="col-8 card-title ' + historyDetail.userID + '-username" style="text-align: right">'+historyDetail.userID+'</h4>'
                     }
-                    newcard += '                    <h4 class="col-8 card-title ' + historyDetail.userID + '-username" style="text-align: right">'+historyDetail.userID+'</h4>\
-                                                </div>\
+                    newcard += '                </div>\
                                                 <h6 class="card-text">score: '+historyDetail.score+'</h6>\
                                                 <p class="text-muted">played at '+ play_time +'</p>\
                                             </div>\
@@ -418,8 +420,8 @@ function getMaps(Search = "", Difficulty = ""){
         $('#listOfMusic').html('\
         <div class="input-group mb-3">\
             <input type="text" id="searchMapKeywords" class="form-control" placeholder="Keyword" aria-label="Search">\
-            <select class="form-select" id="selectMapDifficulty" aria-label="Select difficulty">\
-                <option selected value="">Difficulty</option>\
+            <select class="form-select" id="selectMapDifficulty" aria-label="Select difficulty" style="max-width: fit-content;">\
+                <option selected value="">All</option>\
                 <option value="easy">Easy</option>\
                 <option value="normal">Normal</option>\
                 <option value="hard">Hard</option>\
@@ -442,7 +444,7 @@ function getMaps(Search = "", Difficulty = ""){
                 
                 var content = '';
                 content += '\
-                <div class="card mb-3">\
+                <div class="card bg-light bg-gradient mb-3">\
                     <div class="card-body">\
                         <div class="row">\
                             <h4 class="card-title col">'+songname+'</h4>\
@@ -453,13 +455,13 @@ function getMaps(Search = "", Difficulty = ""){
                                 <p class="card-text">By:\n'+username.val()+'</p>\
                             </div>\
                             <div class="col-4">\
-                                <a href="#' + songname.split(' ').join('_') + '_detail" class="btn btn-primary collapsed" data-bs-toggle="collapse" aria-expanded="false" aria-controls="' + songname.split(' ').join('_') + '_detail" style="width: 100%;">Detail</a>\
+                                <a href="#' + songname.split(' ').join('_') + '_detail" class="btn btn-outline-primary collapsed" data-bs-toggle="collapse" aria-expanded="false" aria-controls="' + songname.split(' ').join('_') + '_detail" style="width: 100%;">Detail</a>\
                             </div>\
                         </div>\
                         <div style="text-align:center; margin-top: 6px;">'
                 // if have link then get button, otherwise no button
                 if (Object.keys(val).includes("storageLink")){
-                    content += '            <button class="btn btn-info" style="left: 50%; width: 80%; padding: 6px;" onclick="selectMusic(\'' + val.storageLink.mp3 + '\', \'' + val.storageLink.csv + '\'); setSection(\'instruction-section\')">Start Game</button>'
+                    content += '            <button class="btn" style="left: 50%; width: 80%; padding: 6px; background-color: SkyBlue;" onclick="selectMusic(\'' + val.storageLink.mp3 + '\', \'' + val.storageLink.csv + '\'); setSection(\'instruction-section\')">Start Game</button>'
                 }else{
                     content += '            <p style="padding-top: 16px;">Please select in game</p>'
                 }
@@ -532,9 +534,9 @@ function getMaps(Search = "", Difficulty = ""){
                         
                         //highlight comment if comment belongs to the user
                         if (comment.userID = currentUser.uid){
-                            temp_commentCard += '            <div class="card bg-light card-body mb-3">'
+                            temp_commentCard += '            <div class="card bg-gradient card-body mb-3" style="background-color: AliceBlue">'
                         }else{
-                            temp_commentCard += '            <div class="card card-body mb-3">'
+                            temp_commentCard += '            <div class="card bg-light bg-gradient card-body mb-3">'
                         }
                         
                         temp_commentCard += '\
@@ -589,7 +591,7 @@ function getHistoryList(){
                     play_time = play_time[2] + ' ' + play_time[1] + ' ' + play_time[3] + ' ' + play_time[4];
                     
                     var historyCard = '';
-                    if (history.userID == currentUser.uid) historyCard += '<div class="card bg-info bg-gradient mb-3">'
+                    if (history.userID == currentUser.uid) historyCard += '<div class="card bg-gradient mb-3" style="background-color: AliceBlue">'
                     else historyCard += '<div class="card bg-light bg-gradient mb-3">'
                     historyCard += '\
                         <div class="card-body">\
@@ -601,9 +603,9 @@ function getHistoryList(){
                             Perfect: '+history.spec.perfect+' Good: '+history.spec.good+' Miss: ' + history.spec.missed +'\
                             </p>'
                     if (history.userID == currentUser.uid){
-                        historyCard += '    <h6 class="card-subtitle mb-2 text-muted">you played at '+ play_time +'</h6>'
+                        historyCard += '    <h6 class="card-subtitle mb-2 text-muted"><span style="color: DarkBlue">you</span> played at '+ play_time +'</h6>'
                     }else{
-                        historyCard += '    <h6 class="card-subtitle mb-2 text-muted"><strong style="color: DarkBlue">'+ users.val()[history.userID].username +'</strong> played at '+ play_time +'</h6>'
+                        historyCard += '    <h6 class="card-subtitle mb-2 text-muted"><strong style="color: DarkGreen">'+ users.val()[history.userID].username +'</strong> played at '+ play_time +'</h6>'
                     }
                     historyCard += '\
                         </div>\
