@@ -119,6 +119,18 @@ function GoogleSignin(){
         // The signed-in user info.
         var user = result.user;
         // ...
+        console.log("Successfully log in with google");
+        //detect if registered before
+        DB.ref('users/'+user.uid+'/registerDateAndTimeUTC').get().then(snapshot => {
+            if(!snapshot.exists()){
+                // new user
+                DB.ref('users/'+user.uid).update({
+                    userEmail: user.email,
+                    username: user.email,
+                    registerDateAndTimeUTC: getUTCDateAndTime()
+                });
+            }
+        })
     }).catch((error) => {
         // Handle Errors here.
         var errorCode = error.code;
@@ -160,14 +172,14 @@ function ResetPasswordViaEmail(){
 
 // Set user profile
 function ProfileSave(newUsername, newPassword, confirmNewPassword){
-    // check if anything is chagned at all
-    if (newUsername == currentUser.username && newPassword == ""){
-        return
-    }
-
     // check format
     if (newUsername.length < 3 || newUsername.includes('@') || newUsername.includes(' ')){
         alert("Invalid username")
+        return
+    }
+
+    // check if anything is chagned at all
+    if (newUsername == currentUser.username && newPassword == ""){
         return
     }
 
@@ -188,6 +200,7 @@ function ProfileSave(newUsername, newPassword, confirmNewPassword){
                 })
                 currentUser.username = newUsername
                 alert("Username updated!")
+                location.reload();
             }
         })
     }
@@ -208,7 +221,7 @@ firebase.auth().onAuthStateChanged((user) => {
         // User is signed in, see docs for a list of available properties
         // https://firebase.google.com/docs/reference/js/firebase.User
         currentUser = user;
-
+        
         // update user last signin time
         var d = new Date();
         DB.ref('users/' + user.uid).update({
@@ -218,28 +231,24 @@ firebase.auth().onAuthStateChanged((user) => {
         // empty sign in forms
         $("input").val("");
 
-        // if no username then set default username to its email address
-        DB.ref('users/'+user.uid).get().then(snapshot => {
-            if (!snapshot.child('username').exists()){
-                DB.ref('users/' + user.uid).update({
-                    username: snapshot.val().userEmail
-                });
-                currentUser.username = snapshot.val().userEmail
+        // if no username then set default username to its uid
+        DB.ref('users/'+user.uid + '/username').get().then(snapshot => {
+            if (!snapshot.exists()){
+                DB.ref('users/' + user.uid + '/username').set(user.uid);
+                currentUser.username = user.uid
             }else{
-                currentUser.username = snapshot.val().username
+                currentUser.username = snapshot.val()
             }
             $("#profile-username").val(currentUser.username)
+
+            // set welcome text
+            $("#welcome-text").text("Hi, "+currentUser.username);
         });
 
         // tell Unity UID of current user
         if (ws_connected){
             ws.send("uid:" + currentUser.uid);
         }
-
-        // set welcome text
-        DB.ref('users/'+currentUser.uid+'/username').get().then(username => {
-            $("#welcome-text").text("Hi, "+username.val());
-        })
 
         // remove sign in reminders
         $(".signin-reminder").addClass("d-none");
