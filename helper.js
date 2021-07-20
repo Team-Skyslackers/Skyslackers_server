@@ -297,6 +297,10 @@ firebase.auth().onAuthStateChanged((user) => {
                 var allUIDdisplayed = []; // for updating UID with username
                 DB.ref("game_history").orderByChild("musicID").equalTo(songname).get().then(history =>{
                     if (!history.exists()) return;
+
+                    // sort by score in descending order
+                    var historyList = Object.values(history.val());
+                    historyList.sort((a, b) => parseInt(b.score) - parseInt(a.score));
                     
                     var newcard = '<div class="accordion-item">\
                                         <h2 class="accordion-header" id="' + songname.split(' ').join('_') + 'heading">\
@@ -307,14 +311,13 @@ firebase.auth().onAuthStateChanged((user) => {
                                         <div id="collapse'+songname.split(' ').join('_')+'" class="accordion-collapse collapse" aria-labelledby="' + songname.split(' ').join('_') + 'heading" data-bs-parent="#leaderboard-list">\
                                             <div class="accordion-body">';
     
-                    var historyList = Object.values(history.val());
                     // console.log(historyList);
-
-                    // sort by score in descending order
-                    historyList.sort((a, b) => parseInt(b.score) - parseInt(a.score));
 
                     // record the userID that has already been displayed on the leaderboard
                     var displayedID=[];
+
+                    // record current rank
+                    var leaderboard_rank = 1;
 
                     // constrains up to how many people can be displayed on the leaderboard
                     var onlyDisplayTopHowMany = 10;
@@ -339,7 +342,15 @@ firebase.auth().onAuthStateChanged((user) => {
                             newcard += '        <div class="card mb-3">'
                         }
                         newcard += '            <div class="card-body">\
-                                                    <h4 class="card-title ' + historyDetail.userID + '-username">'+historyDetail.userID+'</h4>\
+                                                    <div class="row">'
+                        
+                        if (leaderboard_rank == 1){ // add gold star for No.1 user
+                        newcard += '                    <h4 class="col-4 card-title">No.'+leaderboard_rank+'<span style="color:Gold">&#9733;</span></h4>'
+                        }else{
+                        newcard += '                    <h4 class="col-4 card-title">No.'+leaderboard_rank+'</h4>'
+                        }
+                        newcard += '                    <h4 class="col-8 card-title ' + historyDetail.userID + '-username" style="text-align: right">'+historyDetail.userID+'</h4>\
+                                                    </div>\
                                                     <h6 class="card-text">score: '+historyDetail.score+'</h6>\
                                                     <p class="text-muted">played at '+ play_time +'</p>\
                                                 </div>\
@@ -347,6 +358,7 @@ firebase.auth().onAuthStateChanged((user) => {
                         if (displayedID.length >= onlyDisplayTopHowMany){
                             break
                         }
+                        leaderboard_rank++;
                     }
                     newcard += '</div></div></div>';
                     leaderboardList.append(newcard);
@@ -456,7 +468,8 @@ function getMaps(Search = "", Difficulty = ""){
                 content += '\
                             <h6>Creator: '+ username.val() +'</h6>\
                             <h6>Creation time: '+ creation_time +'</h6>\
-                            <h6 id="'+ songname.split(' ').join('_') +'-timesPlayed">Played: many times</h6>\
+                            <h6 id="'+ songname.split(' ').join('_') +'_timesPlayed">Played: many times</h6>\
+                            <div id="'+songname.split(' ').join('_')+'_highest_score" style="margin: 0px"></div>\
                             <hr>\
                             <h4>Comments</h4>\
                             <div class="overflow-auto mb-3" style="padding: 0px; max-height: 50vh" id="'+songname.split(' ').join('_')+'-commentSection">Comments</div>\
@@ -471,11 +484,21 @@ function getMaps(Search = "", Difficulty = ""){
                 $('#listOfMusic').append(content);
 
                 // update number of times played
-                DB.ref("game_history").child(songname).get().then(history =>{
+                DB.ref("game_history").orderByChild("musicID").equalTo(songname).get().then(history =>{
                     if (history.exists()){
-                        $("#"+songname.split(' ').join('_')+"-timesPlayed").text("Played: "+Object.keys(history.val()).length +" time(s)")
+                        $("#"+songname.split(' ').join('_')+"_timesPlayed").text("Played: "+Object.keys(history.val()).length +" time(s)")
+                        
+                        // sort history list
+                        var historyList = Object.values(history.val());
+                        historyList.sort((a, b) => parseInt(b.score) - parseInt(a.score));
+                        console.log(historyList[0])
+                        DB.ref("users").child(historyList[0].userID).get().then(user => {
+                            $("#"+songname.split(' ').join('_')+"_highest_score").html('\
+                            <h6>Highest score: <span style="color: DarkBlue">'+historyList[0].score+'</span> by <span style="color: DarkBlue">'+user.val().username+'</span></h6>\
+                            ')
+                        })
                     }else{
-                        $("#"+songname.split(' ').join('_')+"-timesPlayed").text("Has not been played yet")
+                        $("#"+songname.split(' ').join('_')+"_timesPlayed").text("Has not been played yet")
                     }
                 })
 
@@ -784,7 +807,7 @@ function newScore(Uid, MusicID, Score, Perfect, Good, Missed, DateAndTime){
             })
         }
     });
-
+    getHistoryList();
 }
 
 // for test only
