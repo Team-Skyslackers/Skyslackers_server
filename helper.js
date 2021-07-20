@@ -280,6 +280,7 @@ firebase.auth().onAuthStateChanged((user) => {
         $(".signin-reminder").removeClass("d-none");
 
         // reset contents
+        $('#mapSearchBar').html("");
         $('#listOfMusic').html("");
         $('#leaderboard-list').html("");
         $("#new-maps-notification").html("");
@@ -422,21 +423,36 @@ function getLeaderboard(){
     });
 }
 
+function resetSearchBar(){
+    $('#searchMapKeywords').val("")
+    $('#selectMapDifficulty').val("")
+}
+
 function getMaps(Search = "", Difficulty = ""){
     DB.ref("songs").get().then((snapshot) => {
         if (!snapshot.exists()) return;
 
-        $('#listOfMusic').html('\
-        <div class="input-group mb-3">\
-            <input type="text" id="searchMapKeywords" class="form-control" placeholder="Keyword" aria-label="Search">\
-            <select class="form-select" id="selectMapDifficulty" aria-label="Select difficulty" style="max-width: fit-content;">\
-                <option selected value="">All</option>\
-                <option value="easy">Easy</option>\
-                <option value="normal">Normal</option>\
-                <option value="hard">Hard</option>\
-            </select>\
-            <button class="btn btn-outline-secondary" type="button" onclick="getMaps($(\'#searchMapKeywords\').val(), $(\'#selectMapDifficulty\').val())">Search</button>\
-        </div>');
+        if ($('#mapSearchBar').html() == ""){
+            $('#mapSearchBar').html('\
+            <div class="input-group mb-3">\
+                <input type="text" id="searchMapKeywords" class="form-control" placeholder="Keyword" aria-label="Search">\
+                <select class="form-select" id="selectMapDifficulty" aria-label="Select difficulty" style="max-width: fit-content;">\
+                    <option selected value="">All</option>\
+                    <option value="easy">Easy</option>\
+                    <option value="normal">Normal</option>\
+                    <option value="hard">Hard</option>\
+                </select>\
+                <button class="btn btn-outline-secondary" type="button" onclick="getMaps($(\'#searchMapKeywords\').val(), $(\'#selectMapDifficulty\').val())">Search</button>\
+            </div>');
+        }
+
+        $("#listOfMusic").html("");
+        if (Search != "" || Difficulty != ""){
+            $("#listOfMusic").html('\
+            <div class="container" style="text-align: center">\
+                <button class="btn btn-outline-primary mb-3" style="width: 80%; padding: 6px" onclick="resetSearchBar(); getMaps()">Clear search results</button>\
+            <div');
+        }
         snapshot.forEach(function(data){
             var val = data.val();
             var songname = data.key;
@@ -449,7 +465,7 @@ function getMaps(Search = "", Difficulty = ""){
 
                 // filter by keyword
                 // discard if both song title and username does not include the keyword
-                if (!songname.includes(Search) && !username.val().includes(Search)) return;
+                if (!songname.toLowerCase().includes(Search.toLowerCase()) && !username.val().toLowerCase().includes(Search.toLowerCase())) return;
                 
                 var content = '';
                 content += '\
@@ -633,14 +649,14 @@ function getHistoryList(){
 }
 
 function postComment(musicID){
-    var comment = $("#"+musicID+"-commentinput").val();
+    var comment = $("#"+musicID.split(' ').join('_')+"-commentinput").val();
     DB.ref("songs/" + musicID + "/comments").push({
         dateAndTimeUTC: getUTCDateAndTime(),
         content: comment,
         userID: currentUser.uid
     });
-    $("#"+musicID+"-commentinput").val("");
     alert("comment posted!")
+    $("#"+musicID.split(' ').join('_')+"-commentinput").val("");
 }
 
 function authState(state){
