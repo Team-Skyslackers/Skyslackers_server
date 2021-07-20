@@ -245,133 +245,17 @@ firebase.auth().onAuthStateChanged((user) => {
         // remove sign in reminders
         $(".signin-reminder").addClass("d-none");
 
-        // get game history
-        getHistoryList()
-
         // get friends list
         getFriendsList()
+        
+        // get game history
+        getHistoryList()
 
         // get map list
         getMaps();
 
         // get notification for new maps, get leaderboard
-        DB.ref("songs").get().then((snapshot) => {
-            if (!snapshot.exists()) return;
-
-            snapshot.forEach(function(data){
-                var val = data.val();
-                var songname = data.key;
-
-                // update dashboard - new maps
-                DB.ref('users/' + currentUser.uid + '/NewMapNotification/' + songname).get().then(notification_state => {
-                    if (!notification_state.exists()){
-                        var creation_time = new Date(val.details.creationTime + 'Z');
-                        var diff = Math.abs(new Date() - creation_time) / (1000*60*60*24); // in days
-                        if (diff <= 7){ // uploaded within 7 days
-                            // add to recent uploads
-                            var temp = "";
-                            temp += '\
-                            <div class="card bg-success bg-gradient mb-3" id="'+songname.split(' ').join('_')+'-new-map-notification">\
-                                <div class="card-body row">\
-                                <div class="col-8">\
-                                   <h4 class="card-title">New map!</h4>\
-                                   <h6 class="card-text"><strong>'+songname+'</strong></h6>\
-                                   <h6 class="card-text">Published '+Math.floor(diff)+' day(s) ago</h6>\
-                                </div>\
-                                <div class="col-4">\
-                                   <button class="btn btn-secondary" onclick="$(\'#'+songname.split(' ').join('_')+'-new-map-notification\').fadeOut(); dismissNewMapNotification(\''+songname+'\')">dismiss</button>\
-                                </div>\
-                                </div>\
-                            </div>'
-                            $("#new-maps-notification").append(temp);
-                        }
-                    }
-                })
-            })
-
-            // retrieve leaderboard
-            leaderboardList = $('#leaderboard-list');
-            leaderboardList.html("");
-            snapshot.forEach(function(song){
-                var songname = song.key;
-                var allUIDdisplayed = []; // for updating UID with username
-                DB.ref("game_history").orderByChild("musicID").equalTo(songname).get().then(history =>{
-                    if (!history.exists()) return;
-
-                    // sort by score in descending order
-                    var historyList = Object.values(history.val());
-                    historyList.sort((a, b) => parseInt(b.score) - parseInt(a.score));
-                    
-                    var newcard = '<div class="accordion-item">\
-                                        <h2 class="accordion-header" id="' + songname.split(' ').join('_') + 'heading">\
-                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse'+songname.split(' ').join('_')+'" aria-expanded="false" aria-controls="collapse'+songname.split(' ').join('_')+'">\
-                                                <strong>'+songname+'</strong>\
-                                            </button>\
-                                        </h2>\
-                                        <div id="collapse'+songname.split(' ').join('_')+'" class="accordion-collapse collapse" aria-labelledby="' + songname.split(' ').join('_') + 'heading" data-bs-parent="#leaderboard-list">\
-                                            <div class="accordion-body">';
-    
-                    // console.log(historyList);
-
-                    // record the userID that has already been displayed on the leaderboard
-                    var displayedID=[];
-
-                    // record current rank
-                    var leaderboard_rank = 1;
-
-                    // constrains up to how many people can be displayed on the leaderboard
-                    var onlyDisplayTopHowMany = 10;
-                    for (const historyID in historyList) {
-                        // console.log(historyList[historyID]);
-                        historyDetail = historyList[historyID];
-                        var play_time = new Date(historyDetail.dateAndTimeUTC + 'Z');
-                        play_time = play_time.toString().split(' ')
-                        play_time = play_time[2] + ' ' + play_time[1] + ' ' + play_time[3] + ' ' + play_time[4];
-
-                        // skip if the score belongs to a user that has already been displayed on the leaderboard with a higher score
-                        if (displayedID.includes(historyDetail.userID)){
-                            continue
-                        }else{
-                            displayedID.push(historyDetail.userID)
-                            allUIDdisplayed.push(historyDetail.userID)
-                        }
-                        
-                        if (historyDetail.userID == currentUser.uid){
-                            newcard += '        <div class="card mb-3 bg-info">'
-                        }else{
-                            newcard += '        <div class="card mb-3">'
-                        }
-                        newcard += '            <div class="card-body">\
-                                                    <div class="row">'
-                        
-                        if (leaderboard_rank == 1){ // add gold star for No.1 user
-                        newcard += '                    <h4 class="col-4 card-title">No.'+leaderboard_rank+'<span style="color:Gold">&#9733;</span></h4>'
-                        }else{
-                        newcard += '                    <h4 class="col-4 card-title">No.'+leaderboard_rank+'</h4>'
-                        }
-                        newcard += '                    <h4 class="col-8 card-title ' + historyDetail.userID + '-username" style="text-align: right">'+historyDetail.userID+'</h4>\
-                                                    </div>\
-                                                    <h6 class="card-text">score: '+historyDetail.score+'</h6>\
-                                                    <p class="text-muted">played at '+ play_time +'</p>\
-                                                </div>\
-                                            </div>';
-                        if (displayedID.length >= onlyDisplayTopHowMany){
-                            break
-                        }
-                        leaderboard_rank++;
-                    }
-                    newcard += '</div></div></div>';
-                    leaderboardList.append(newcard);
-
-                    // replace UID with username
-                    for (const UID in allUIDdisplayed){
-                        DB.ref('users/' + allUIDdisplayed[UID] + '/username').get().then(username => {
-                            $("." + allUIDdisplayed[UID] + "-username").text(username.val());
-                        })
-                    }
-                })
-            })
-        });
+        getLeaderboard();
 
         $(".auth").addClass("d-none");
         $("#signout-form").removeClass("d-none");
@@ -405,6 +289,127 @@ firebase.auth().onAuthStateChanged((user) => {
         console.log("No user signed in")
     }
 });
+
+function getLeaderboard(){
+    DB.ref("songs").get().then((snapshot) => {
+        if (!snapshot.exists()) return;
+
+        snapshot.forEach(function(data){
+            var val = data.val();
+            var songname = data.key;
+
+            // update dashboard - new maps
+            DB.ref('users/' + currentUser.uid + '/NewMapNotification/' + songname).get().then(notification_state => {
+                if (!notification_state.exists()){
+                    var creation_time = new Date(val.details.creationTime + 'Z');
+                    var diff = Math.abs(new Date() - creation_time) / (1000*60*60*24); // in days
+                    if (diff <= 7){ // uploaded within 7 days
+                        // add to recent uploads
+                        var temp = "";
+                        temp += '\
+                        <div class="card bg-success bg-gradient mb-3" id="'+songname.split(' ').join('_')+'-new-map-notification">\
+                            <div class="card-body row">\
+                            <div class="col-8">\
+                               <h4 class="card-title">New map!</h4>\
+                               <h6 class="card-text"><strong>'+songname+'</strong></h6>\
+                               <h6 class="card-text">Published '+Math.floor(diff)+' day(s) ago</h6>\
+                            </div>\
+                            <div class="col-4">\
+                               <button class="btn btn-secondary" onclick="$(\'#'+songname.split(' ').join('_')+'-new-map-notification\').fadeOut(); dismissNewMapNotification(\''+songname+'\')">dismiss</button>\
+                            </div>\
+                            </div>\
+                        </div>'
+                        $("#new-maps-notification").append(temp);
+                    }
+                }
+            })
+        })
+
+        // retrieve leaderboard
+        leaderboardList = $('#leaderboard-list');
+        leaderboardList.html("");
+        snapshot.forEach(function(song){
+            var songname = song.key;
+            var allUIDdisplayed = []; // for updating UID with username
+            DB.ref("game_history").orderByChild("musicID").equalTo(songname).get().then(history =>{
+                if (!history.exists()) return;
+
+                // sort by score in descending order
+                var historyList = Object.values(history.val());
+                historyList.sort((a, b) => parseInt(b.score) - parseInt(a.score));
+                
+                var newcard = '<div class="accordion-item">\
+                                    <h2 class="accordion-header" id="' + songname.split(' ').join('_') + 'heading">\
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse'+songname.split(' ').join('_')+'" aria-expanded="false" aria-controls="collapse'+songname.split(' ').join('_')+'">\
+                                            <strong>'+songname+'</strong>\
+                                        </button>\
+                                    </h2>\
+                                    <div id="collapse'+songname.split(' ').join('_')+'" class="accordion-collapse collapse" aria-labelledby="' + songname.split(' ').join('_') + 'heading" data-bs-parent="#leaderboard-list">\
+                                        <div class="accordion-body">';
+
+                // console.log(historyList);
+
+                // record the userID that has already been displayed on the leaderboard
+                var displayedID=[];
+
+                // record current rank
+                var leaderboard_rank = 1;
+
+                // constrains up to how many people can be displayed on the leaderboard
+                var onlyDisplayTopHowMany = 10;
+                for (const historyID in historyList) {
+                    // console.log(historyList[historyID]);
+                    historyDetail = historyList[historyID];
+                    var play_time = new Date(historyDetail.dateAndTimeUTC + 'Z');
+                    play_time = play_time.toString().split(' ')
+                    play_time = play_time[2] + ' ' + play_time[1] + ' ' + play_time[3] + ' ' + play_time[4];
+
+                    // skip if the score belongs to a user that has already been displayed on the leaderboard with a higher score
+                    if (displayedID.includes(historyDetail.userID)){
+                        continue
+                    }else{
+                        displayedID.push(historyDetail.userID)
+                        allUIDdisplayed.push(historyDetail.userID)
+                    }
+                    
+                    if (historyDetail.userID == currentUser.uid){
+                        newcard += '        <div class="card mb-3 bg-info">'
+                    }else{
+                        newcard += '        <div class="card mb-3">'
+                    }
+                    newcard += '            <div class="card-body">\
+                                                <div class="row">'
+                    
+                    if (leaderboard_rank == 1){ // add gold star for No.1 user
+                    newcard += '                    <h4 class="col-4 card-title">No.'+leaderboard_rank+'<span style="color:Gold">&#9733;</span></h4>'
+                    $("#" + songname.split(' ').join('_') + '_' + historyDetail.userID + '_score').css("color", "Goldenrod")
+                    }else{
+                    newcard += '                    <h4 class="col-4 card-title">No.'+leaderboard_rank+'</h4>'
+                    }
+                    newcard += '                    <h4 class="col-8 card-title ' + historyDetail.userID + '-username" style="text-align: right">'+historyDetail.userID+'</h4>\
+                                                </div>\
+                                                <h6 class="card-text">score: '+historyDetail.score+'</h6>\
+                                                <p class="text-muted">played at '+ play_time +'</p>\
+                                            </div>\
+                                        </div>';
+                    if (displayedID.length >= onlyDisplayTopHowMany){
+                        break
+                    }
+                    leaderboard_rank++;
+                }
+                newcard += '</div></div></div>';
+                leaderboardList.append(newcard);
+
+                // replace UID with username
+                for (const UID in allUIDdisplayed){
+                    DB.ref('users/' + allUIDdisplayed[UID] + '/username').get().then(username => {
+                        $("." + allUIDdisplayed[UID] + "-username").text(username.val());
+                    })
+                }
+            })
+        })
+    });
+}
 
 function getMaps(Search = "", Difficulty = ""){
     DB.ref("songs").get().then((snapshot) => {
@@ -491,7 +496,6 @@ function getMaps(Search = "", Difficulty = ""){
                         // sort history list
                         var historyList = Object.values(history.val());
                         historyList.sort((a, b) => parseInt(b.score) - parseInt(a.score));
-                        console.log(historyList[0])
                         DB.ref("users").child(historyList[0].userID).get().then(user => {
                             $("#"+songname.split(' ').join('_')+"_highest_score").html('\
                             <h6>Highest score: <span style="color: DarkBlue">'+historyList[0].score+'</span> by <span style="color: DarkBlue">'+user.val().username+'</span></h6>\
@@ -591,7 +595,7 @@ function getHistoryList(){
                         <div class="card-body">\
                         <div class="row">\
                             <h4 class="card-title col-6">'+history.musicID+'</h4>\
-                            <h5 class="card-text col-6" style="text-align: right"><strong>Score: '+history.score+'</strong></h5>\
+                            <h5 class="card-text col-6" style="text-align: right"><strong>Score: <span id="'+history.musicID.split(' ').join('_')+'_' + history.userID + '_score">'+history.score+'</span></strong></h5>\
                         </div>\
                         <p class="card-text">\
                             Perfect: '+history.spec.perfect+' Good: '+history.spec.good+' Miss: ' + history.spec.missed +'\
@@ -599,11 +603,15 @@ function getHistoryList(){
                     if (history.userID == currentUser.uid){
                         historyCard += '    <h6 class="card-subtitle mb-2 text-muted">you played at '+ play_time +'</h6>'
                     }else{
-                        historyCard += '    <h6 class="card-subtitle mb-2 text-muted"><strong>'+ users.val()[history.userID].username +'</strong> played at '+ play_time +'</h6>'
+                        historyCard += '    <h6 class="card-subtitle mb-2 text-muted"><strong style="color: DarkBlue">'+ users.val()[history.userID].username +'</strong> played at '+ play_time +'</h6>'
                     }
                     historyCard += '\
                         </div>\
                     </div>'
+                    
+                    // add to friend's detail card
+                    $("#" + history.userID + "_userGameHistory").html(historyCard + $("#" + history.userID + "_userGameHistory").html());
+                    
                     historylist = historyCard+historylist
                 }
             })
@@ -724,15 +732,20 @@ function getFriendsList(){
 
                 friendcard += '\
                 <div class="card mb-3">\
-                    <div class="card-body">\
+                    <div class="card-body" style="text-align: center;">\
                         <div class="row">\
-                            <h4 class="card-title col-8">'+friend.val().username+'</h4>\
-                            <div class="col-4">\
+                            <h4 class="card-title col-8" style="text-align: left;">'+friend.val().username+'</h4>\
+                            <div class="col-4" style="text-align: right;">\
                                 <button class="btn btn-outline-secondary" onclick="removeFriend(\''+friendID+'\')">remove</button>\
                             </div>\
                         </div>\
-                        <h6 class="card-subtitle mb-2 text-muted">Last login on '+ friend_last_login +'</h6>\
-                        <h6 class="card-subtitle mb-2 text-muted">Friended on '+ friend_time +'</h6>\
+                        <h6 class="card-subtitle mb-2 text-muted" style="text-align: left;">Last login on '+ friend_last_login +'</h6>\
+                        <h6 class="card-subtitle mb-2 text-muted" style="text-align: left;">Friended on '+ friend_time +'</h6>\
+                        <a href="#' + friendID + '_userDetail" class="btn btn-primary collapsed" data-bs-toggle="collapse" aria-expanded="false" aria-controls="#' + friendID + '_userDetail" style="width: 60%;">Game history</a>\
+                        <div class="collapse" id="' + friendID + '_userDetail">\
+                            <hr>\
+                            <div id="' + friendID + '_userGameHistory" class="overflow-auto mb-3" style="padding: 0px; max-height: 50vh; text-align: left;"></div>\
+                        </div>\
                     </div>\
                 </div>'
 
@@ -808,6 +821,7 @@ function newScore(Uid, MusicID, Score, Perfect, Good, Missed, DateAndTime){
         }
     });
     getHistoryList();
+    getLeaderboard();
 }
 
 // for test only
