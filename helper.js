@@ -263,25 +263,26 @@ firebase.auth().onAuthStateChanged((user) => {
                 var songname = data.key;
 
                 // update dashboard - new maps
-                DB.ref('users/' + currentUser.uid + '/NewMapNotification').child(songname).get().then(notification_state => {
+                DB.ref('users/' + currentUser.uid + '/NewMapNotification/' + songname).get().then(notification_state => {
                     if (!notification_state.exists()){
                         var creation_time = new Date(val.details.creationTime + 'Z');
                         var diff = Math.abs(new Date() - creation_time) / (1000*60*60*24); // in days
                         if (diff <= 7){ // uploaded within 7 days
                             // add to recent uploads
                             var temp = "";
-                            temp += '<div class="card bg-success bg-gradient mb-3" id="'+songname.split(' ').join('_')+'-new-map-notification">'
-                            temp += '    <div class="card-body row">'
-                            temp += '    <div class="col-8">'
-                            temp += '       <h4 class="card-title">New map!</h4>'
-                            temp += '       <h6 class="card-text"><strong>'+songname+'</strong></h6>'
-                            temp += '       <h6 class="card-text">Published '+Math.floor(diff)+' day(s) ago</h6>'
-                            temp += '    </div>'
-                            temp += '    <div class="col-4">'
-                            temp += '       <button class="btn btn-secondary" onclick="$(\'#'+songname.split(' ').join('_')+'-new-map-notification\').fadeOut(); dismissNewMapNotification(\''+songname.split(' ').join('_')+'\')">dismiss</button>'
-                            temp += '    </div>'
-                            temp += '    </div>'
-                            temp += '</div>'
+                            temp += '\
+                            <div class="card bg-success bg-gradient mb-3" id="'+songname.split(' ').join('_')+'-new-map-notification">\
+                                <div class="card-body row">\
+                                <div class="col-8">\
+                                   <h4 class="card-title">New map!</h4>\
+                                   <h6 class="card-text"><strong>'+songname+'</strong></h6>\
+                                   <h6 class="card-text">Published '+Math.floor(diff)+' day(s) ago</h6>\
+                                </div>\
+                                <div class="col-4">\
+                                   <button class="btn btn-secondary" onclick="$(\'#'+songname.split(' ').join('_')+'-new-map-notification\').fadeOut(); dismissNewMapNotification(\''+songname+'\')">dismiss</button>\
+                                </div>\
+                                </div>\
+                            </div>'
                             $("#new-maps-notification").append(temp);
                         }
                     }
@@ -423,49 +424,50 @@ function getMaps(Search = "", Difficulty = ""){
                 if (!songname.includes(Search) && !username.val().includes(Search)) return;
                 
                 var content = '';
-                content += '<div class="card mb-3">'
-                content += '    <div class="card-body">'
-                content += '        <div class="row">'
-                content += '            <h4 class="card-title col">'+songname+'</h4>'
-                content += '            <h6 class="card-text col" style="text-align: right">Difficulty: ' + val.difficulty + '</h6>'
-                content += '        </div>'
-                content += '        <div class="row">'
-                content += '            <div class="col-8">'
-                content += '                <p class="card-text">By:\n'+username.val()+'</p>'
-                content += '            </div>'
-                content += '            <div class="col-4">'
-                content += '                <a href="#' + songname.split(' ').join('_') + '_detail" class="btn btn-primary collapsed" data-bs-toggle="collapse" aria-expanded="false" aria-controls="' + songname.split(' ').join('_') + '_detail" style="width: 100%;">Detail</a>'
-                content += '            </div>'
-                content += '        </div>'
-                content += '        <div style="text-align:center; margin-top: 6px;">'
+                content += '\
+                <div class="card mb-3">\
+                    <div class="card-body">\
+                        <div class="row">\
+                            <h4 class="card-title col">'+songname+'</h4>\
+                            <h6 class="card-text col" style="text-align: right">Difficulty: ' + val.difficulty + '</h6>\
+                        </div>\
+                        <div class="row">\
+                            <div class="col-8">\
+                                <p class="card-text">By:\n'+username.val()+'</p>\
+                            </div>\
+                            <div class="col-4">\
+                                <a href="#' + songname.split(' ').join('_') + '_detail" class="btn btn-primary collapsed" data-bs-toggle="collapse" aria-expanded="false" aria-controls="' + songname.split(' ').join('_') + '_detail" style="width: 100%;">Detail</a>\
+                            </div>\
+                        </div>\
+                        <div style="text-align:center; margin-top: 6px;">'
                 // if have link then get button, otherwise no button
                 if (Object.keys(val).includes("storageLink")){
                     content += '            <button class="btn btn-info" style="left: 50%; width: 80%; padding: 6px;" onclick="selectMusic(\'' + val.storageLink.mp3 + '\', \'' + val.storageLink.csv + '\'); setSection(\'instruction-section\')">Start Game</button>'
                 }else{
                     content += '            <p style="padding-top: 16px;">Please select in game</p>'
                 }
-                content += '        </div>'
-                content += '        <div class="collapse" id="' + songname.split(' ').join('_') + '_detail">'
-                content += '            <hr>'
-                // content += '            <h4>Info</h4>'
-                // info about the map
+                content += '\
+                        </div>\
+                        <div class="collapse" id="' + songname.split(' ').join('_') + '_detail">\
+                            <hr>'
                 var creation_time = new Date(val.details.creationTime + 'Z');
                 creation_time = creation_time.toString().split(' ')
                 creation_time = creation_time[2] + ' ' + creation_time[1] + ' ' + creation_time[3] + ' ' + creation_time[4];
-                content += '            <h6>Creator: '+ username.val() +'</h6>'
-                content += '            <h6>Creation time: '+ creation_time +'</h6>'
-                content += '            <h6 id="'+ songname.split(' ').join('_') +'-timesPlayed">Played: many times</h6>' // needs update separately
-
-                content += '            <hr>'
-                content += '            <h4>Comments</h4>'
-                content += '            <div class="overflow-auto mb-3" style="padding: 0px; max-height: 50vh" id="'+songname.split(' ').join('_')+'-commentSection">Comments</div>'
-                content += '            <div class="input-group mb-3">'
-                content += '                <input type="text" class="form-control" placeholder="New comment..." id="'+songname.split(' ').join('_')+'-commentinput">'
-                content += '                <button class="btn btn-secondary" onclick="postComment(\''+songname+'\')">Post comment</button>'
-                content += '            </div>'
-                content += '        </div>'
-                content += '    </div>'
-                content += '</div>'
+                content += '\
+                            <h6>Creator: '+ username.val() +'</h6>\
+                            <h6>Creation time: '+ creation_time +'</h6>\
+                            <h6 id="'+ songname.split(' ').join('_') +'-timesPlayed">Played: many times</h6>\
+                            <hr>\
+                            <h4>Comments</h4>\
+                            <div class="overflow-auto mb-3" style="padding: 0px; max-height: 50vh" id="'+songname.split(' ').join('_')+'-commentSection">Comments</div>\
+                                <div class="input-group mb-3">\
+                                    <input type="text" class="form-control" placeholder="New comment..." id="'+songname.split(' ').join('_')+'-commentinput">\
+                                    <button class="btn btn-secondary" onclick="postComment(\''+songname+'\')">Post comment</button>\
+                                </div>\
+                            </div>\
+                        </div>\
+                    </div>\
+                </div>'
                 $('#listOfMusic').append(content);
 
                 // update number of times played
@@ -495,6 +497,9 @@ function getMaps(Search = "", Difficulty = ""){
                     var commentCard = ""
                     for (const commentID in comments.val()){
                         comment = comments.val()[commentID];
+                        var comment_time = new Date(comment.dateAndTimeUTC + 'Z');
+                        comment_time = comment_time.toString().split(' ')
+                        comment_time = comment_time[2] + ' ' + comment_time[1] + ' ' + comment_time[3] + ' ' + comment_time[4];
                         allUIDdisplayed.push(comment.userID);
                         var temp_commentCard = '';
                         
@@ -505,18 +510,13 @@ function getMaps(Search = "", Difficulty = ""){
                             temp_commentCard += '            <div class="card card-body mb-3">'
                         }
                         
-                        temp_commentCard += '                <h4 class="card-text">'+comment.content+'</h4>'
-                        temp_commentCard += '                <div class="row">'
-                        temp_commentCard += '                    <h6 class="col-4 card-subtitle ' + comment.userID + '-username">'+comment.userID+'</h6>'
-
-                        var comment_time = new Date(comment.dateAndTimeUTC + 'Z');
-                        comment_time = comment_time.toString().split(' ')
-                        comment_time = comment_time[2] + ' ' + comment_time[1] + ' ' + comment_time[3] + ' ' + comment_time[4];
-
-                        temp_commentCard += '                    <h6 class="col-8 card-text text-muted">'+comment_time+'</h6>'
-                        temp_commentCard += '                </div>'
-
-                        temp_commentCard += '            </div>'
+                        temp_commentCard += '\
+                                        <h4 class="card-text">'+comment.content+'</h4>\
+                                        <div class="row">\
+                                            <h6 class="col-4 card-subtitle ' + comment.userID + '-username">'+comment.userID+'</h6>\
+                                            <h6 class="col-8 card-text text-muted">'+comment_time+'</h6>\
+                                        </div>\
+                                    </div>'
                         commentCard = temp_commentCard + commentCard;
                     }
 
@@ -544,13 +544,6 @@ function dismissNewMapNotification(musicID){
 function getHistoryList(){
     $("#game-history").html(""); // clean up histories
 
-    // DB.ref('users/'+currentUser.uid+'/friends').get().then(friends => {
-    //     friendUIDtoUsername = {}
-    //     if (!friends.exists()) var userAndFriendsID = [currentUser.uid]
-    //     else {
-    //         var userAndFriendsID = Object.keys(friends.val())
-    //         userAndFriendsID.push(currentUser.uid)
-    //     }
     DB.ref('users').get().then(users => {
         friendUIDtoUsername = {}
         if (!Object.keys(users.val()[currentUser.uid]).includes("friends")) var userAndFriendsID = [currentUser.uid]
@@ -571,21 +564,23 @@ function getHistoryList(){
                     var historyCard = '';
                     if (history.userID == currentUser.uid) historyCard += '<div class="card bg-info bg-gradient mb-3">'
                     else historyCard += '<div class="card bg-light bg-gradient mb-3">'
-                    historyCard += '    <div class="card-body">'
-                    historyCard += '    <div class="row">'
-                    historyCard += '        <h4 class="card-title col-6">'+history.musicID+'</h4>'
-                    historyCard += '        <h5 class="card-text col-6" style="text-align: right"><strong>Score: '+history.score+'</strong></h5>'
-                    historyCard += '    </div>'
-                    historyCard += '    <p class="card-text">'
-                    historyCard += '        Perfect: '+history.spec.perfect+' Good: '+history.spec.good+' Miss: ' + history.spec.missed
-                    historyCard += '        </p>'
+                    historyCard += '\
+                        <div class="card-body">\
+                        <div class="row">\
+                            <h4 class="card-title col-6">'+history.musicID+'</h4>\
+                            <h5 class="card-text col-6" style="text-align: right"><strong>Score: '+history.score+'</strong></h5>\
+                        </div>\
+                        <p class="card-text">\
+                            Perfect: '+history.spec.perfect+' Good: '+history.spec.good+' Miss: ' + history.spec.missed +'\
+                            </p>'
                     if (history.userID == currentUser.uid){
                         historyCard += '    <h6 class="card-subtitle mb-2 text-muted">you played at '+ play_time +'</h6>'
                     }else{
                         historyCard += '    <h6 class="card-subtitle mb-2 text-muted"><strong>'+ users.val()[history.userID].username +'</strong> played at '+ play_time +'</h6>'
                     }
-                    historyCard += '    </div>'
-                    historyCard += '</div>'
+                    historyCard += '\
+                        </div>\
+                    </div>'
                     historylist = historyCard+historylist
                 }
             })
@@ -593,32 +588,6 @@ function getHistoryList(){
             
         })
     })
-}
-
-function updateHistoryCard(musicID, score, perfect, good, missed, dateAndTimeUTC, userID){
-    var play_time = new Date(dateAndTimeUTC + 'Z');
-    play_time = play_time.toString().split(' ')
-    play_time = play_time[2] + ' ' + play_time[1] + ' ' + play_time[3] + ' ' + play_time[4];
-    
-    var historyCard = '';
-    if (userID == currentUser.uid) historyCard += '<div class="card bg-light mb-3">'
-    else historyCard += '<div class="card mb-3">'
-    historyCard += '    <div class="card-body">'
-    historyCard += '    <div class="row">'
-    historyCard += '        <h4 class="card-title col-6">'+musicID+'</h4>'
-    historyCard += '        <h5 class="card-text col-6" style="text-align: right"><strong>Score: '+score+'</strong></h5>'
-    historyCard += '    </div>'
-    historyCard += '    <p class="card-text">'
-    historyCard += '        Perfect: '+perfect+' Good: '+good+' Miss: ' + missed
-    historyCard += '        </p>'
-    if (userID == currentUser.uid){
-        historyCard += '    <h6 class="card-subtitle mb-2 text-muted">you played at '+ play_time +'</h6>'
-    }else{
-        historyCard += '    <h6 class="card-subtitle mb-2 text-muted">you played at '+ play_time +'</h6>'
-    }
-    historyCard += '    </div>'
-    historyCard += '</div>'
-    $("#game-history").append(historyCard);
 }
 
 function postComment(musicID){
@@ -726,19 +695,23 @@ function getFriendsList(){
                 friend_time = friend_time.toString().split(' ')
                 friend_time = friend_time[2] + ' ' + friend_time[1] + ' ' + friend_time[3];
 
-                friendcard += '<div class="card mb-3">'
-                friendcard += '    <div class="card-body">'
-                friendcard += '        <div class="row">'
-                friendcard += '            <h4 class="card-title col-8">'+friend.val().username+'</h4>'
-                friendcard += '            <div class="col-4">'
-                friendcard += '                <button class="btn btn-outline-secondary" onclick="removeFriend(\''+friendID+'\')">remove</button>'
-                friendcard += '            </div>'
-                friendcard += '        </div>'
-                friendcard += '        <h6 class="card-subtitle mb-2 text-muted">Friended on '+ friend_time +'</h6>'
+                var friend_last_login = new Date(friend.val().lastLoginDateAndTimeUTC + 'Z');
+                friend_last_login = friend_last_login.toString().split(' ')
+                friend_last_login = friend_last_login[2] + ' ' + friend_last_login[1] + ' ' + friend_last_login[3];
 
-                // show recent game
-                friendcard += '    </div>'
-                friendcard += '</div>'
+                friendcard += '\
+                <div class="card mb-3">\
+                    <div class="card-body">\
+                        <div class="row">\
+                            <h4 class="card-title col-8">'+friend.val().username+'</h4>\
+                            <div class="col-4">\
+                                <button class="btn btn-outline-secondary" onclick="removeFriend(\''+friendID+'\')">remove</button>\
+                            </div>\
+                        </div>\
+                        <h6 class="card-subtitle mb-2 text-muted">Last login on '+ friend_last_login +'</h6>\
+                        <h6 class="card-subtitle mb-2 text-muted">Friended on '+ friend_time +'</h6>\
+                    </div>\
+                </div>'
 
                 $("#listOfFriends").append(friendcard);
             })
