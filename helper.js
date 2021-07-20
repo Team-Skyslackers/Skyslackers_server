@@ -726,7 +726,7 @@ function getFriendsList(){
                 <button class="btn btn-outline-primary" type="button" onclick="newFriend($(\'#friend-username-input\').val())">Add friend</button>\
             </div>');
         if (!user.exists() || !Object.keys(user.val()).includes("friends")) {
-            $("#listOfFriends").html("No friends yet. Add some friends now!")
+            $("#listOfFriends").append("No friends yet. Add some friends now!")
             return
         }
         var friends = user.val().friends;
