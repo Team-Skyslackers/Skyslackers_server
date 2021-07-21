@@ -326,7 +326,7 @@ function getLeaderboard(){
                                <h6 class="card-text">Published '+Math.floor(diff)+' day(s) ago</h6>\
                             </div>\
                             <div class="col-4">\
-                               <button class="btn btn-secondary" onclick="$(\'#'+songname.split(' ').join('_')+'-new-map-notification\').fadeOut(); dismissNewMapNotification(\''+songname+'\')">dismiss</button>\
+                               <button class="btn btn-outline-secondary" style="width: 100%" onclick="$(\'#'+songname.split(' ').join('_')+'-new-map-notification\').fadeOut(); dismissNewMapNotification(\''+songname+'\')">dismiss</button>\
                             </div>\
                             </div>\
                         </div>'
@@ -769,7 +769,7 @@ function getFriendsList(){
                         </div>\
                         <h6 class="card-subtitle mb-2 text-muted" style="text-align: left;">Last login on '+ friend_last_login +'</h6>\
                         <h6 class="card-subtitle mb-2 text-muted" style="text-align: left;">Friended on '+ friend_time +'</h6>\
-                        <a href="#' + friendID + '_userDetail" class="btn btn-primary collapsed" data-bs-toggle="collapse" aria-expanded="false" aria-controls="#' + friendID + '_userDetail" style="width: 60%;">Game history</a>\
+                        <a href="#' + friendID + '_userDetail" class="btn btn-primary collapsed" data-bs-toggle="collapse" aria-expanded="false" aria-controls="#' + friendID + '_userDetail" style="width: 60%;" onclick="getHistoryList()">Game history</a>\
                         <div class="collapse" id="' + friendID + '_userDetail">\
                             <hr>\
                             <div id="' + friendID + '_userGameHistory" class="overflow-auto mb-3" style="padding: 0px; max-height: 50vh; text-align: left;"></div>\
