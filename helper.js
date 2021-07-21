@@ -326,7 +326,14 @@ function getLeaderboard(){
                                <h6 class="card-text">Published '+Math.floor(diff)+' day(s) ago</h6>\
                             </div>\
                             <div class="col-4">\
-                               <button class="btn btn-outline-secondary" style="width: 100%" onclick="$(\'#'+songname.split(' ').join('_')+'-new-map-notification\').fadeOut(); dismissNewMapNotification(\''+songname+'\')">dismiss</button>\
+                                <button class="btn btn-outline-secondary"\
+                                    style="width: 100%"\
+                                    onclick="\
+                                        $(\'#'+songname.split(' ').join('_')+'-new-map-notification\').fadeOut(); \
+                                        dismissNewMapNotification(\''+songname+'\');\
+                                    "\>\
+                                    dismiss\
+                                </button>\
                             </div>\
                             </div>\
                         </div>'
@@ -686,11 +693,14 @@ function setSection(sec){
     // $("#" + sec +"-button").addClass("text-secondary")
 }
 
+// exploiting bug so that iPhone users no longer need to confirm grand access
 if (navigator.platform == "iPhone"){
     DeviceMotionEvent.requestPermission();
 }
 
 function getAccel(){
+    if ($("#start-game-button").html() == 'Recalibrate') location.reload();
+
     if (navigator.platform == "iPhone"){
         DeviceMotionEvent.requestPermission().then(response => {
             if (response == 'granted') processDeviceOrientation();
