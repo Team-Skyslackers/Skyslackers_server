@@ -711,10 +711,10 @@ function getAccel(){
 }
 
 function processDeviceOrientation(){
-    window.addEventListener('deviceorientation',(event) => {
-        // tell server that orientation info has been granted
-        ws.send('g');
+    // tell server that orientation info has been granted
+    ws.send('g');
     
+    window.addEventListener('deviceorientation',(event) => {
         // Expose each orientation angle in a more readable way
         rotation_degrees = event.alpha;
         frontToBack_degrees = event.beta;

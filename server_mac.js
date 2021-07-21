@@ -120,11 +120,16 @@ var UID2;
 
 motionControllerServer2.on('connection', function (motionController) {
   phoneClient2 = motionController;
-  console.log('controller connected');
+  console.log('controller2 connected');
+  var client1_connection_count = 0;
+  motionControllerServer1.clients.forEach(client => client1_connection_count++);
+  if (client1_connection_count == 0){
+    console.log("using controller2 as controller1");
+  }
   motionController.on('message', function (message) {
     // console.log('received: %s', message);
     if (message == 'g') {
-      console.log('gyro info received');
+      console.log('gyro2 info received');
       const script = 'tell application "Skyslackers" to activate';
       applescript.execString(script);
     }else if(message.slice(0, 3) == "uid"){
@@ -132,6 +137,12 @@ motionControllerServer2.on('connection', function (motionController) {
       console.log(message);
     }else {
       wsUnityServer2.clients.forEach(unity => unity.send(message));
+
+      var client1_connection_count = 0;
+      motionControllerServer1.clients.forEach(client => client1_connection_count++);
+      if (client1_connection_count == 0){
+        wsUnityServer1.clients.forEach(unity => unity.send(message));
+      }
     }
     
   });
