@@ -686,13 +686,25 @@ function setSection(sec){
     // $("#" + sec +"-button").addClass("text-secondary")
 }
 
+if (navigator.platform == "iPhone"){
+    DeviceMotionEvent.requestPermission();
+}
+
 function getAccel(){
-    var first_time = 1;
+    if (navigator.platform == "iPhone"){
+        DeviceMotionEvent.requestPermission().then(response => {
+            if (response == 'granted') processDeviceOrientation();
+        });
+    }else{
+        processDeviceOrientation();
+    }
+}
+
+function processDeviceOrientation(){
     window.addEventListener('deviceorientation',(event) => {
-        if (first_time == 1) {
-            ws.send('g');
-            first_time = 0;
-        }
+        // tell server that orientation info has been granted
+        ws.send('g');
+    
         // Expose each orientation angle in a more readable way
         rotation_degrees = event.alpha;
         frontToBack_degrees = event.beta;
@@ -700,33 +712,8 @@ function getAccel(){
         var rd = Math.trunc(rotation_degrees);
         var fd = Math.trunc(frontToBack_degrees);
         var ld = Math.trunc(leftToRight_degrees);
-        //ws.send("rd is " + rd.toString() + ", " + "fd is " + fd.toString() + ", " + "ld is " + ld.toString());
-
-        // ws.send('alpha = '+rotation_degrees);
         ws.send("gyro:" + event.alpha + " " + event.beta + " " + event.gamma);
-        // ws.send('gamma = '+leftToRight_degrees);
 
-    })
-    DeviceMotionEvent.requestPermission().then(response => {
-        // document.getElementById("debug").innerHTML = "Hello";
-        if (response == 'granted') {
-            ws.send('g'); 
-            // Add a listener to get smartphone orientation
-            // in the alpha-beta-gamma axes (units in degrees)
-            window.addEventListener('deviceorientation',(event) => {
-                // Expose each orientation angle in a more readable way
-                rotation_degrees = event.alpha;
-                frontToBack_degrees = event.beta;
-                leftToRight_degrees = event.gamma;
-                var rd = Math.trunc(rotation_degrees);
-                var fd = Math.trunc(frontToBack_degrees);
-                var ld = Math.trunc(leftToRight_degrees);
-                //ws.send("rd is " + rd.toString() + ", " + "fd is " + fd.toString() + ", " + "ld is " + ld.toString());
-
-                // ws.send('alpha = '+rotation_degrees);
-                ws.send("gyro:" + event.alpha + " " + event.beta + " " + event.gamma);
-            });
-        }
     });
 }
 
