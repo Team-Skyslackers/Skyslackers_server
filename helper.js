@@ -442,14 +442,14 @@ function getMaps(Search = "", Difficulty = ""){
         if ($('#mapSearchBar').html() == ""){
             $('#mapSearchBar').html('\
             <div class="input-group mb-3">\
-                <input type="text" id="searchMapKeywords" class="form-control" placeholder="Keyword" aria-label="Search">\
+                <input type="text" id="searchMapKeywords" class="form-control" placeholder="Search title/creator" aria-label="Search">\
                 <select class="form-select" id="selectMapDifficulty" aria-label="Select difficulty" style="max-width: fit-content;">\
-                    <option selected value="">All</option>\
+                    <option selected value="">Difficulty</option>\
                     <option value="easy">Easy</option>\
                     <option value="normal">Normal</option>\
                     <option value="hard">Hard</option>\
                 </select>\
-                <button class="btn btn-outline-secondary" type="button" onclick="getMaps($(\'#searchMapKeywords\').val(), $(\'#selectMapDifficulty\').val())">Search</button>\
+                <button class="btn btn-outline-primary" type="button" onclick="getMaps($(\'#searchMapKeywords\').val(), $(\'#selectMapDifficulty\').val())">Search</button>\
             </div>');
         }
 
@@ -487,7 +487,13 @@ function getMaps(Search = "", Difficulty = ""){
                                 <p class="card-text">By:\n'+username.val()+'</p>\
                             </div>\
                             <div class="col-4">\
-                                <a href="#' + songname.split(' ').join('_') + '_detail" class="btn btn-outline-primary collapsed" data-bs-toggle="collapse" aria-expanded="false" aria-controls="' + songname.split(' ').join('_') + '_detail" style="width: 100%;">Detail</a>\
+                                <a href="#' + songname.split(' ').join('_') + '_detail"\
+                                 class="btn btn-outline-secondary collapsed" \
+                                 data-bs-toggle="collapse" aria-expanded="false" \
+                                 aria-controls="' + songname.split(' ').join('_') + '_detail" \
+                                 style="width: 100%;">\
+                                 Detail\
+                                 </a>\
                             </div>\
                         </div>\
                         <div style="text-align:center; margin-top: 6px;">'
@@ -525,7 +531,10 @@ function getMaps(Search = "", Difficulty = ""){
                 // update number of times played
                 DB.ref("game_history").orderByChild("musicID").equalTo(songname).get().then(history =>{
                     if (history.exists()){
-                        $("#"+songname.split(' ').join('_')+"_timesPlayed").text("Played: "+Object.keys(history.val()).length +" time(s)")
+                        var times_played = Object.keys(history.val()).length;
+                        if (times_played == 1) $("#"+songname.split(' ').join('_')+"_timesPlayed").text("Played: 1 time")
+                        else $("#"+songname.split(' ').join('_')+"_timesPlayed").text("Played: "+times_played+" times")
+                        
                         
                         // sort history list
                         var historyList = Object.values(history.val());
@@ -736,7 +745,7 @@ function getFriendsList(){
     DB.ref('users/' + currentUser.uid).get().then(user => {
         $("#listOfFriends").html('\
             <div class="input-group mb-3" id="friend-search">\
-                <input type="text" class="form-control" placeholder="Search username..." aria-label="Username" id="friend-username-input">\
+                <input type="text" class="form-control" placeholder="Your friend\'s username" aria-label="Username" id="friend-username-input">\
                 <button class="btn btn-outline-primary" type="button" onclick="newFriend($(\'#friend-username-input\').val())">Add friend</button>\
             </div>');
         if (!user.exists() || !Object.keys(user.val()).includes("friends")) {
