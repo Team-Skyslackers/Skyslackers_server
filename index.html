@@ -14,8 +14,6 @@
             .center-fit {
                 max-width: 80%;
                 max-height: 100vh;
-                padding-top: 5%;
-                padding-bottom: 5%;
                 margin: auto;
             }
             .button {
@@ -228,13 +226,30 @@
 
         <!-- instruction -->
         <div class="container section" id="instruction-section">
-            <p>Point your phone towards the computer screen and tap on the button below:</p>
             <div class="d-grid gap-2 mb-3">
-                <button id="start-game-button" class="btn btn-primary btn-lg" onclick="getAccel()">
-                    Start game!
+                <button id="start-game-button" 
+                    class="btn"
+                    onclick="getAccel(); $(this).html('<img src=\'Recalibrate.png\' alt=\'LOGO\' class=\'center-fit\'>'); $(this).addClass('recalibrate')">
+                    <img src="StartGame.png" alt="LOGO" class="center-fit">
                 </button>
             </div>
-            <p>Please keep your screen on while playing the game!</p>
+            <div class="accordion" id="accordionExample">
+                <div class="accordion-item">
+                <h2 class="accordion-header" id="headingOne">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#Hints_section" aria-expanded="false" aria-controls="Hints_section">
+                    Hints...
+                    </button>
+                </h2>
+                <div id="Hints_section" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                    <div class="accordion-body">
+                        <p><span style="color:red">Hint 1</span>: Point your phone towards the computer screen then tap on the "Start" button.</p>
+                        <p><span style="color:red">Hint 2</span>: This webpage can only send motion information to the game while the webpage is active. <strong>Keep your screen on at all time!</strong></p>
+                        <p><span style="color:red">Hint 3</span>: <strong>Use 5GHz Wi-Fi</strong> for better gaming experience. If you are using 2.4GHz Wi-Fi, you know what I'm saying.</p>
+                        <p><span style="color:red">Hint 4</span>: The lightsaber's motion may lose sync with your phone's motion after some time. Recalibrate the lightsaber by tapping on the "Recalibrate" button or by refreshing the page, then tap on the "Start" button.</p>            
+                    </div>
+                </div>
+                </div>
+            </div>
         </div>
         
         <!-- Music Maps -->
