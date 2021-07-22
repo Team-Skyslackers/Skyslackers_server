@@ -103,7 +103,14 @@ wsUnityServer1.on('connection', function connection(ws_Unity) {
   console.log('Unity connected');
   ws_Unity.on('message', function (message){
     console.log("Unity sent: " + message);
-    phoneClient1.send(message);
+
+    var client1_connection_count = 0;
+    motionControllerServer1.clients.forEach(client => client1_connection_count++);
+    if (client1_connection_count == 0){
+      phoneClient2.send(message);
+    } else {
+      phoneClient1.send(message);
+    }
   });
   ws_Unity.on('close', function close(){
     console.log("Unity disconnected");
