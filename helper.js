@@ -699,7 +699,7 @@ if (navigator.platform == "iPhone"){
 }
 
 function getAccel(){
-    if ($("#start-game-button").html() == 'Recalibrate') location.reload();
+    if ($("#start-game-button").hasClass("recalibrate")) location.reload();
 
     if (navigator.platform == "iPhone"){
         DeviceMotionEvent.requestPermission().then(response => {
@@ -713,7 +713,7 @@ function getAccel(){
 function processDeviceOrientation(){
     // tell server that orientation info has been granted
     ws.send('g');
-    
+
     window.addEventListener('deviceorientation',(event) => {
         // Expose each orientation angle in a more readable way
         rotation_degrees = event.alpha;
