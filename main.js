@@ -16,19 +16,8 @@ appp.use(express.static(__dirname));
 // readFileSync function must use __dirname get current directory
 // require use ./ refer to current directory.
 
-var local_IP_address = "";
-var interfaces = require("os").networkInterfaces();
-for (var k in interfaces) {
-  for (var i in interfaces[k]) {
-    if (
-      interfaces[k][i].family == "IPv4" &&
-      interfaces[k][i].address != "127.0.0.1" &&
-      !interfaces[k][i].internal
-    ) {
-      local_IP_address = interfaces[k][i].address;
-    }
-  }
-}
+var ip = require('ip');
+var local_IP_address = ip.address()
 
 const certs = {
   key: fs.readFileSync(__dirname + "/key.pem", 'utf8'),
