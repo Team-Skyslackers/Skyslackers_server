@@ -75,26 +75,27 @@ ipcRenderer.on('controller2state', function (event,store) {
 function setStartGameButton(active){
     console.log(active)
     if (active){
-        $("#start-game-button").removeAttr('disabled')
+        $("#start-game-button").removeAttr('disabled');
+        console.log("removed");
     } else {
         $("#start-game-button").attr('disabled', true)
     }
 }
 
 function opengame(){
-    if (connected1) {
-        const script = 'tell application "skyslackers_build" to activate';
-        applescript.execString(script);
 
-        // var exec = require('child_process').execFile;
-        // var fun =function(){
-        //     console.log("opening the game");
-        //     exec('skyslackers_build.exe', function(err, data) {  
-        //         // console.log(err)
-        //         // console.log(data.toString());                       
-        //     });  
-        // }
-        // fun();
-    }
+    const script = 'tell application "skyslackers_build" to activate';
+    applescript.execString(script);
+    console.log("hello");
+
+    // var exec = require('child_process').execFile;
+    // var fun =function(){
+    //     console.log("opening the game");
+    //     exec('skyslackers_build.exe', function(err, data) {  
+    //         // console.log(err)
+    //         // console.log(data.toString());                       
+    //     });  
+    // }
+    // fun();
 
 }
