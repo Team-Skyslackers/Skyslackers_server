@@ -103,7 +103,6 @@ function opengame(){
 
     const script = 'tell application "skyslackers_build" to activate';
     applescript.execString(script);
-    console.log("hello");
 
     // var exec = require('child_process').execFile;
     // var fun =function(){

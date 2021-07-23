@@ -153,11 +153,12 @@ motionControllerServer2.on('connection', function (motionController) {
       UID2 = message.split(" ")[0].slice(4);
       console.log(message);
     }else {
-      wsUnityServer2.clients.forEach(unity => unity.send(message));
       var client1_connection_count = 0;
       motionControllerServer1.clients.forEach(client => client1_connection_count++);
       if (client1_connection_count == 0){
         wsUnityServer1.clients.forEach(unity => unity.send(message));
+      }else{
+        wsUnityServer2.clients.forEach(unity => unity.send(message));
       }
     }
     
