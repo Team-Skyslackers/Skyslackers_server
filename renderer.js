@@ -54,9 +54,11 @@ ipcRenderer.on('controller1state', function (event,store) {
     if (store == "connected"){
         controller1connected = true;
         $("#player1state").css('color', 'green')
+        showAlert("success", "Player 1 is ready")
     }else if (store == "disconnected"){
         controller1connected = false;
         $("#player1state").css('color', 'red')
+        showAlert("error", "Player 1 is disconnected")
     }
     setStartGameButton(controller1connected || controller2connected);
 })
@@ -65,9 +67,11 @@ ipcRenderer.on('controller2state', function (event,store) {
     if (store == "connected"){
         controller2connected = true;
         $("#player2state").css('color', 'green')
+        showAlert("success", "Player 2 is ready")
     }else if (store == "disconnected"){
         controller2connected = false;
         $("#player2state").css('color', 'red')
+        showAlert("error", "Player 2 is disconnected")
     }
     setStartGameButton(controller1connected || controller2connected);
 })
@@ -79,6 +83,19 @@ function setStartGameButton(active){
     } else {
         $("#start-game-button").attr('disabled', true)
     }
+}
+
+function showAlert(type, info){
+    // type = success / error
+    $("#success_alert").addClass("d-none");
+    $("#error_alert").addClass("d-none");
+
+    $("#"+type+"_alert_info").html(info);
+    $("#"+type+"_alert").removeClass("d-none");
+    setTimeout(() => {
+        $("#"+type+"_alert").addClass("d-none");
+    }, 3000);
+
 }
 
 function opengame(){
