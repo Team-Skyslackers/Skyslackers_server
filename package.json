@@ -6,13 +6,18 @@
   "scripts": {
     "start": "electron .",
     "pack": "electron-builder --dir",
-    "dist-all": "electron-builder -mw"
+    "dist-all": "electron-builder -mw",
+    "package-mac": "electron-packager . Skyslackers --overwrite --platform=darwin --arch=x64 --icon=icon.icns",
+    "package-win": "electron-packager . Skyslackers --overwrite --platform=win32 --arch=x64 --icon=icon.ico"
   },
   "build": {
     "appId": "com. Example.ExampleApp",
     "win": {
       "target": "nsis",
-      "icon": "build/icon.png"
+      "icon": "icon.ico"
+    },
+    "mac": {
+      "icon": "icon.icns"
     }
   },
   "repository": "https://github.com/electron/electron-quick-start",
@@ -27,7 +32,8 @@
   "license": "CC0-1.0",
   "devDependencies": {
     "electron": "^13.1.7",
-    "electron-builder": "^22.11.7"
+    "electron-builder": "^22.11.7",
+    "electron-packager": "^15.3.0"
   },
   "dependencies": {
     "applescript": "^1.0.0",
