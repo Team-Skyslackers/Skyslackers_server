@@ -32,16 +32,15 @@
     <title>Skyslackers Game Launcher</title>
   </head>
   <body>
-    <p style="text-align: center;">Scan the QR code or key in URL using your phone to log in and start the game.<br>To design and upload your own maps, visit <strong>http://team-skyslackers.github.io</strong> using Safari/Chrome browser.</p>
+    <p style="text-align: center;">Connect your phone and computer to the same router via Wi-Fi or cable.<br>Scan the QR code below or key in URL on your phone and tap on "Ready" to start the game.<br>To design and upload your own maps, visit <strong>http://team-skyslackers.github.io</strong> using Safari/Chrome browser.</p>
     
     <div class="row container mb-3" style="margin: auto; max-width: 800px;">
       <div class="col-6">
         <div class="card h-100" style="width: 100%;">
           <div class="card-body" style="text-align: center;">
-            <h5 class="card-title" id="player1state">Player 1</h5>
-            <!-- <h5 class="card-text" style="text-align: center;">please scan the code below</h5> -->
+            <h6 class="card-title" id="player1state" style="margin-bottom: 0px;">Player 1</h6>
             <div id="QRcode1"></div>
-            <p id="URL1"></p>
+            <p id="URL1" style="margin-bottom: 0px;"></p>
             <div class="d-none" id="1stPlayerQRCover" style="margin-top: 50%; margin-left: 15%; margin-right: 15%; width: 70%;">
               <h3>Move cursor away to show QR code for Player 1</h3>
             </div>
@@ -51,10 +50,9 @@
       <div class="col-6">
         <div class="card h-100" style="width: 100%;" onmouseover="showQR2();" onmouseleave="hideQR2()">
           <div class="card-body" style="text-align: center;">
-            <h5 class="card-title" id="player2state">Player 2</h5>
-            <!-- <h5 class="card-text" style="text-align: center;">please scan the code below</h5> -->
+            <h6 class="card-title" id="player2state" style="margin-bottom: 0px;">Player 2</h6>
             <div class="d-none" id="QRcode2"></div>
-            <p class="d-none" id="URL2"></p>
+            <p class="d-none" id="URL2" style="margin-bottom: 0px;"></p>
             <div id="2ndPlayerQRCover" style="margin-top: 50%; margin-left: 15%; margin-right: 15%; width: 70%;">
               <h3>Move cursor here to show QR code for Player 2</h3>
             </div>
@@ -71,13 +69,13 @@
       <div id="success_alert" class="alert alert-success d-flex align-items-center d-none" role="alert">
         <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Success:"><use xlink:href="#check-circle-fill"/></svg>
         <div id="success_alert_info">
-          An example success alert with an icon
+          wow
         </div>
       </div>
       <div id="error_alert" class="alert alert-danger d-flex align-items-center d-none" role="alert">
         <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>
         <div id="error_alert_info">
-          An example danger alert with an icon
+          aha
         </div>
       </div>
 
