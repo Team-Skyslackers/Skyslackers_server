@@ -1,5 +1,5 @@
 // Modules to control application life and create native browser window
-const {app, BrowserWindow} = require('electron')
+const {app, BrowserWindow, ipcMain} = require('electron')
 const path = require('path')
 const https = require('https');
 const fs = require('fs');
@@ -9,8 +9,8 @@ var express = require('express');
 var appp = express();
 var link1;
 var link2;
-var url1;
-var url2;
+var qr1;
+var qr2;
 let mainWindow;
 appp.use(express.static(__dirname));
 // readFileSync function must use __dirname get current directory
@@ -45,8 +45,8 @@ var httpsServer1 = https.createServer(certs, appp).listen(18000, function () {
   + local_IP_address.split('.')[1] + '-' + local_IP_address.split('.')[2] + '-' 
   + local_IP_address.split('.')[3] + ".xip.lhjmmc.cn:" + "18000/";
   QRCode.toString(link1,{type:'svg'}, function (err, url) {
-    console.log(url);
-    url1 = url;
+    // console.log(url);
+    qr1 = url;
   })
 });
 
@@ -58,8 +58,8 @@ var httpsServer2 = https.createServer(certs, appp).listen(19000, function () {
   + local_IP_address.split('.')[1] + '-' + local_IP_address.split('.')[2] + '-' 
   + local_IP_address.split('.')[3] + ".xip.lhjmmc.cn:" + "19000/";
   QRCode.toString(link2,{type:'svg'}, function (err, url) {
-    console.log(url)
-    url2 = url;
+    // console.log(url)
+    qr2 = url;
   })
 });
 
@@ -86,11 +86,11 @@ var UID1;
 motionControllerServer1.on('connection', function (motionController) {
   phoneClient1 = motionController;
   console.log('controller connected');
-  mainWindow.webContents.send('connected', '1');
   motionController.on('message', function (message) {
     // console.log('received: %s', message);
     if (message == 'g') {
       console.log('gyro info received');
+      mainWindow.webContents.send('controller1state', 'connected');
     }else if(message.slice(0, 3) == "uid"){
       UID1 = message.split(" ")[0].slice(4);
       console.log(message);
@@ -101,7 +101,7 @@ motionControllerServer1.on('connection', function (motionController) {
   });
   motionController.on('close', function close(){
     console.log('controller disconnected');
-    mainWindow.webContents.send('disconnected', '1')
+    mainWindow.webContents.send('controller1state', 'disconnected')
   });
 })
 
@@ -138,7 +138,6 @@ var UID2;
 motionControllerServer2.on('connection', function (motionController) {
   phoneClient2 = motionController;
   console.log('controller2 connected');
-  mainWindow.webContents.send('connected', '2');
   var client1_connection_count = 0;
   motionControllerServer1.clients.forEach(client => client1_connection_count++);
   if (client1_connection_count == 0){
@@ -149,6 +148,7 @@ motionControllerServer2.on('connection', function (motionController) {
     // console.log('received: %s', message);
     if (message == 'g') {
       console.log('gyro2 info received');
+      mainWindow.webContents.send('controller2state', 'connected');
     }else if(message.slice(0, 3) == "uid"){
       UID2 = message.split(" ")[0].slice(4);
       console.log(message);
@@ -164,7 +164,7 @@ motionControllerServer2.on('connection', function (motionController) {
   });
   motionController.on('close', function close(){
     console.log('controller disconnected');
-    mainWindow.webContents.send('disconnected', '2')
+    mainWindow.webContents.send('controller2state', 'disconnected')
   });
 })
 // wsUnityServer.on('listening',()=>{
@@ -190,19 +190,30 @@ function createWindow () {
   // Create the browser window.
   mainWindow = new BrowserWindow({
     width: 800,
-    height: 600,
+    height: 750,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
-      preload: path.join(__dirname, 'preload.js')
+      // preload: path.join(__dirname, 'preload.js')
       
     }
   })
+  // mainWindow.webContents.openDevTools()
 
   // and load the index.html of the app.
   mainWindow.loadFile('app.html')
-  mainWindow.webContents.send('store-data', url1 + '***' + url2);
+  mainWindow.webContents.send('store-data', qr1 + '***' + qr2);
   mainWindow.webContents.send('store-url', link1 + '***' + link2);
+
+  ipcMain.on('qr-request', (event, arg) => {
+    console.log("QR requested")
+    event.sender.send('qr-request', qr1 + '***' + qr2);
+  })
+
+  ipcMain.on('link-request', (event, arg) => {
+    console.log("link request")
+    event.sender.send('link-request', link1 + '***' + link2);
+  })
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()
@@ -231,6 +242,6 @@ app.on('window-all-closed', function () {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 // function test(){
-//   document.getElementById("QRcode1").innerHTML = url1;
-//   console.log(url1+'hello');
+//   document.getElementById("QRcode1").innerHTML = qr1;
+//   console.log(qr1+'hello');
 // }

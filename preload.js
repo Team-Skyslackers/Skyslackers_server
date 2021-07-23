@@ -12,20 +12,20 @@
   
 // })
 
+// var ipcRenderer = require('electron').ipcRenderer;
 
-var ipcRenderer = require('electron').ipcRenderer;
-ipcRenderer.on('store-data', function (event,store) {
-    document.getElementById("QRcode1").innerHTML = "<svg id = \"qr1\" " + store.split("***")[0].slice(4);
-    document.getElementById("QRcode2").innerHTML = "<svg id = \"qr2\" " + store.split("***")[1].slice(4);
-    // console.log(store+"hello");
+// ipcRenderer.on('store-data', function (event,store) {
+//   // console.log("QR received")
+//   // document.getElementById("QRcode1").innerHTML = "<svg id = \"qr1\" " + store.split("***")[0].slice(4);
+//   // document.getElementById("QRcode1").innerHTML = store.split("***")[0];
+//   // document.getElementById("QRcode2").innerHTML = store.split("***")[1];
+// });
+// ipcRenderer.on('store-url', function (event,store) {
+//   document.getElementById("URL1").innerHTML = store.split("***")[0];
+//   document.getElementById("URL2").innerHTML = store.split("***")[1];
+//   // console.log(store+"hello");
 
-});
-ipcRenderer.on('store-url', function (event,store) {
-  document.getElementById("URL1").innerHTML = store.split("***")[0];
-  document.getElementById("URL2").innerHTML = store.split("***")[1];
-  // console.log(store+"hello");
-
-});
+// });
 
 
 

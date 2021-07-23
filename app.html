@@ -1,242 +1,62 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <style>
-      #player2 {
-        visibility: hidden;
-      }
-      #qr1 {
-        transform: scale(0.8);
-        /* position: absolute;
-        left: -200px;
-        top: -60px; */
-      }
-      #qr2 {
-        transform: scale(0.8);
-        /* position: absolute;
-        left: 200px;
-        top: -100px; */
-        /* display: none; */
-      }
-      #text1 {
-        position: absolute;
-        left: 160px;
-        top: 180px;
-        z-index: 999;
-      }
-      #text2 {
-        position: absolute;
-        left: 490px;
-        top: 180px;
-        z-index: 999;
-        /* display: none; */
-      }
-      #welcome {
-        text-align: center;
-        font-size: 18px;
-        font-weight: bold;
-      }
-      p {text-align: center;}
-      div {text-align: center;}
-      #connect1 {
-        background-color: rgb(219, 219, 219);
-        position: absolute;
-        left: 50px;
-        top: 170px;
-        z-index: 999;
-        width:300px;
-        height:322px;
-        /* font-size: 20px; */
-      } 
+    <!-- Bootstrap Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script>let $ = require('jquery');</script>
+    <script>require('popper.js');</script>
+    <script>require('bootstrap');</script>
 
-      #connect2 {
-        position: absolute;
-        background-color:rgb(219, 219, 219);
-        left: 440px;
-        top: 170px;
-        z-index: 999;
-        width:300px;
-        height: 322px;
-      } 
-      #add {
-        position: absolute;
-        background-color:rgb(219, 219, 219);
-        left: 440px;
-        top: 170px;
-        z-index: 999;
-        height: 322px;
-        width:300px;
-        border:none;
-        cursor: pointer;
-        font-size: 100px;
-      }
-      #URL1 {
-        /* position: absolute;
-        left: 100px;
-        top: 440px;
-        z-index: 999;
-        font-size: 10px; */
-      }
-      #URL2 {
-        /* position: absolute;
-        left: 500px;
-        top: 400px;
-        z-index: 999;
-        font-size: 10px; */
-        /* display: none; */
-      }
-      #st1 {
-        position: absolute;
-        left: 120px;
-        top: 500px;
-        z-index: 999;
-        font-weight: bold;
-        color: rgb(136, 136, 136);
-        /* font-size: 10px; */
-      }
-      #st2 {
-        position: absolute;
-        left: 520px;
-        top: 500px;
-        z-index: 999;
-        font-weight: bold;
-        color: rgb(136, 136, 136);
-        /* font-size: 10px; */
-        /* display: none; */
-      }
-      #cross {
-        cursor: pointer;
-        position: relative;
-        left:105px;
-        font-size: 11px;
-      }
-      .button {
-        background-color: #ffffff; /* Green */
-        border: none;
-        color: white;
-        padding: 16px 32px;
-        text-align: center;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 16px;
-        margin: 4px 2px;
-        transition-duration: 0.4s;
-        cursor: pointer;
-        z-index: 999;
-      }
-      .button2 {
-        position: absolute;
-        left: 320px;
-        top: 500px;
-        background-color: white; 
-        color: black; 
-        border: 2px solid #008CBA;
-        opacity: 0.4;
-        cursor: not-allowed;
-      }
+    <script defer src="./renderer.js"></script>
 
-      .button2:hover {
-        background-color: #008CBA;
-        color: white;
-      }
-      .hw {
-        /* position:absolute;
-        /* width: 100px; */
-        /* background-color: black; */
-        /* color: #fff; */
-        /* text-align: center; */
-        /* border-radius: 6px; */
-        /* padding: 100px 100; */
-        /* top: 78px;
-        left: -350%;  */
-        /* margin-top: -100px; */ 
-        visibility: hidden;
-      }
-      .hw2 {
-        position:relative;
-        /* width: 100px; */
-        /* text-align: center; */
-        /* border-radius: 6px; */
-        /* padding: 100px 100; */
-        /* top: 78px;
-        left: -350%;  */
-        margin-top: -40px;
-        visibility: hidden;
-      }
-
-      .connect:hover .hw{
-        visibility: visible;
-      }
-      .connect:hover .hw2{
-        visibility: visible;
-      }
-      #player1 {
- 
-        /* visibility: hidden; */
-      }
-      #bg1 {
-        position: absolute;
-        font-size: 400px;
-        top: -95px;
-        left: 25px;
-        z-index: -1;
-        opacity: 0.2;
-      }
-
-      #bg2 {
-        position: absolute;
-        font-size: 400px;
-        top: -95px;
-        left: 28px;
-        z-index: -1;
-        opacity: 0.2;
-      }
-    </style>
     <meta charset="UTF-8">
     <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://requirejs.org/docs/release/2.3.5/minified/require.js 'unsafe-inline' 'unsafe-eval';">
-    <div class="imgbox">
-      <img src="LOGO.png" alt="LOGO" class="center-fit" width="500" height="100" >
+    <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://requirejs.org/docs/release/2.3.5/minified/require.js 'unsafe-inline' 'unsafe-eval';"> -->
+    <div class="mb-3" style="text-align: center;">
+      <img src="LOGO.png" alt="LOGO" style="width: 80%;">
     </div>
     <title>Skyslackers Game Launcher</title>
   </head>
   <body>
-    <div id = "welcome">Scan the QR code or key in URL using your phone to log in and start the game.</div>
-    <div id = "inst">To design and upload your own maps, visit http://team-skyslackers.github.io using Safari/Chrome browser.</div>
-    <div id = "player1">
-      <!-- <div id = "text1" >Single Player</div> -->
-      <button id = "connect1" class = "connect">
-        Player 1
-        <span id = "QRcode1" class = "hw"></span>
-        <span id = "URL1" class = "hw2"></span>
-        <span id = "bg1">&#9876</span>
-      </button>
-
-      <div id = 'st1'>
-        Controller Unconnected
+    <p style="text-align: center;">Scan the QR code or key in URL using your phone to log in and start the game.</p>
+    <p style="text-align: center;">To design and upload your own maps, visit <strong>http://team-skyslackers.github.io</strong> using Safari/Chrome browser.</p>
+    
+    <div class="row container mb-3" style="margin: auto;">
+      <div class="col-6">
+        <div class="card h-100" style="width: 100%;">
+          <div class="card-body" style="text-align: center;">
+            <h5 class="card-title" id="player1state">Player 1</h5>
+            <!-- <h5 class="card-text" style="text-align: center;">please scan the code below</h5> -->
+            <div id="QRcode1"></div>
+            <p id="URL1"></p>
+            <div class="d-none" id="1stPlayerQRCover" style="margin-top: 50%; margin-left: 15%; margin-right: 15%; width: 70%;">
+              <h3>Move cursor away to show QR code for Player 1</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="card h-100" style="width: 100%;" onmouseover="showQR2();" onmouseleave="hideQR2()">
+          <div class="card-body" style="text-align: center;">
+            <h5 class="card-title" id="player2state">Player 2</h5>
+            <!-- <h5 class="card-text" style="text-align: center;">please scan the code below</h5> -->
+            <div class="d-none" id="QRcode2"></div>
+            <p class="d-none" id="URL2"></p>
+            <div id="2ndPlayerQRCover" style="margin-top: 50%; margin-left: 15%; margin-right: 15%; width: 70%;">
+              <h3>Move cursor here to show QR code for Player 2</h3>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-    <div id = "slot">
-      <button id = "add" onclick = "addplayer()" class = "connect"> + </button>
-    </div> 
-    <div id = "player2">
-      <!-- <div id = "text2">Player2</div> -->
-      <button id = "connect2" class = "connect">
-        Player 2
-        <span id = "cross" onclick = "deleteplayer()">&#10540;</span>
-        <span id = "QRcode2" class = "hw"></span>
-        <span id = "URL2" class = "hw2"></span>
-        <span id = "bg2">&#9876</span>
-      </button>
-      <div id = 'st2'>
-        Controller Unconnected
-      </div>
-    </div>
-   
 
-    <button id = "btn" class="button button2" disable = "true" onclick="opengame()">Start Game</button>
+    <div class="container" style="text-align: center;">
+      <button id="start-game-button" class="btn btn-primary mb-3" onclick="opengame()" disabled>Start Game</button>
+    </div>
+
+
     <!-- You can also require other files to run in this process -->
-    <script src="./renderer.js"></script>
     <script src="https://requirejs.org/docs/release/2.3.5/minified/require.js"></script>
 
   </body>
