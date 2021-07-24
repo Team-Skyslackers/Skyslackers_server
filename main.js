@@ -1,5 +1,5 @@
 // Modules to control application life and create native browser window
-const {app, BrowserWindow, ipcMain} = require('electron')
+const {app, BrowserWindow, ipcMain, dialog} = require('electron')
 const path = require('path')
 const https = require('https');
 const fs = require('fs');
@@ -37,8 +37,12 @@ const certs = {
   cert: fs.readFileSync(__dirname + "/cert.pem", 'utf8')
 };
 
+process.on('uncaughtException', (err) => {
+  console.log(dialog.showErrorBox("Network Resources Occupied", "Skyslacker might already be running\nPlease try to close all unnecessary application and try again"))
+  process.exit();
+});
 
- // Create HTTPs server.
+// Create HTTPs server.
 var httpsServer1 = https.createServer(certs, appp).listen(18000, function () {
   console.log("server running at https://" + local_IP_address.split('.')[0]+ '-'
   + local_IP_address.split('.')[1] + '-' + local_IP_address.split('.')[2] + '-' 
