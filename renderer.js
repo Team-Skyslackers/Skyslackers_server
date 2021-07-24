@@ -47,6 +47,7 @@ function hideQR2(){
 }
 
 // detect controller connection state
+var multiplayer_mode = false;
 var controller1connected = false;
 var controller2connected = false;
 
@@ -66,7 +67,7 @@ ipcRenderer.on('controller1state', function (event,store) {
         }, 3000);
         showAlert("error", "Player 1 is disconnected")
     }
-    setStartGameButton(controller1connected || controller2connected);
+    setStartGameButton(multiplayer_mode? controller1connected && controller2connected: controller1connected || controller2connected);
 })
 
 ipcRenderer.on('controller2state', function (event,store) {
@@ -85,21 +86,23 @@ ipcRenderer.on('controller2state', function (event,store) {
         }, 3000);
         showAlert("error", "Player 2 is disconnected")
     }
-    setStartGameButton(controller1connected || controller2connected);
+    setStartGameButton(multiplayer_mode? controller1connected && controller2connected: controller1connected || controller2connected);
 })
 
 function toggleMultiplayer(){
-    if($("#multiplayer-toggle-button").html() == "Multiplayer Mode"){
+    if(!multiplayer_mode){
         $("#multiplayer-toggle-button").html("Single Player Mode")
         $("#player2card").removeClass("d-none")
+        multiplayer_mode = true;
     }else{
         $("#multiplayer-toggle-button").html("Multiplayer Mode")
         $("#player2card").addClass("d-none")
+        multiplayer_mode = false;
     }
+    setStartGameButton(multiplayer_mode? controller1connected && controller2connected: controller1connected || controller2connected);
 }
 
 function setStartGameButton(active){
-    console.log(active)
     if (active){
         $("#start-game-button").removeAttr('disabled');
         console.log("removed");
