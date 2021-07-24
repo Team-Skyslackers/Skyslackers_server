@@ -32,37 +32,40 @@
     <title>Skyslackers Game Launcher</title>
   </head>
   <body>
-    <p style="text-align: center;">Connect your phone and computer to the same router via Wi-Fi or cable.<br>Scan the QR code below or key in URL on your phone and tap on "Ready" to start the game.<br>To design and upload your own maps, visit <strong>http://team-skyslackers.github.io</strong> using Safari/Chrome browser.</p>
+    <p style="text-align: center;">Connect your phone and computer to the same router via Wi-Fi or cable.<br>Scan the QR code below or key in URL on your phone and tap on "Ready" to start the game.</p>
     
-    <div class="row container mb-3" style="margin: auto; max-width: 800px;">
-      <div class="col-6">
-        <div class="card h-100" style="width: 100%;">
-          <div class="card-body" style="text-align: center;">
-            <h6 class="card-title" id="player1state" style="margin-bottom: 0px;">Player 1</h6>
-            <div id="QRcode1"></div>
-            <p id="URL1" style="margin-bottom: 0px;"></p>
-            <div class="d-none" id="1stPlayerQRCover" style="margin-top: 50%; margin-left: 15%; margin-right: 15%; width: 70%;">
-              <h3>Move cursor away to show QR code for Player 1</h3>
-            </div>
+    <div class="card-group container mb-3" style="margin: auto; justify-content: center">
+      <div class="card" id="player1card" style="width: 100%; max-width: 40vw">
+        <div class="card-body" style="text-align: center;">
+          <h6 class="card-title" id="player1state" style="margin-bottom: 0px;">Player 1</h6>
+          <p id="URL1" style="margin-bottom: 0px;"></p>
+          <div class="d-none" id="1stPlayerQRCover" style="margin-top: 40%; margin-left: 15%; margin-right: 15%; width: 70%;">
+            <h3>Move cursor away to show QR code for Player 1</h3>
           </div>
+          <div id="QRcode1"></div>
         </div>
       </div>
-      <div class="col-6">
-        <div class="card h-100" style="width: 100%;" onmouseover="showQR2();" onmouseleave="hideQR2()">
-          <div class="card-body" style="text-align: center;">
-            <h6 class="card-title" id="player2state" style="margin-bottom: 0px;">Player 2</h6>
-            <div class="d-none" id="QRcode2"></div>
-            <p class="d-none" id="URL2" style="margin-bottom: 0px;"></p>
-            <div id="2ndPlayerQRCover" style="margin-top: 50%; margin-left: 15%; margin-right: 15%; width: 70%;">
-              <h3>Move cursor here to show QR code for Player 2</h3>
-            </div>
+      <div class="card d-none" id="player2card" style="width: 100%; max-width: 40vw;" onmouseover="showQR2();" onmouseleave="hideQR2()">
+        <div class="card-body" style="text-align: center;">
+          <h6 class="card-title" id="player2state" style="margin-bottom: 0px;">Player 2</h6>
+          <p id="URL2" style="margin-bottom: 0px;"></p>
+          <div id="2ndPlayerQRCover" style="margin-top: 40%; margin-left: 15%; margin-right: 15%; width: 70%;">
+            <h3>Move cursor here to show QR code for Player 2</h3>
           </div>
+          <div class="d-none" id="QRcode2"></div>
         </div>
       </div>
     </div>
 
-    <div class="container" style="text-align: center;">
-      <button id="start-game-button" class="btn btn-primary mb-3" onclick="opengame()" disabled>Start Game</button>
+    <div class="container">
+      <div class="row">
+        <div class="col" style="text-align: right;">
+          <button id="multiplayer-toggle-button" class="btn btn-danger mb-3" onclick="toggleMultiplayer()">Multiplayer Mode</button>
+        </div>
+        <div class="col" style="text-align: left;">
+          <button id="start-game-button" class="btn btn-primary mb-3" onclick="opengame()" disabled>Start Game</button>
+        </div>
+      </div>
     </div>
 
     <div id="alert_center" class="container">
@@ -80,6 +83,27 @@
       </div>
 
     </div>
+
+    <div class="container accordion mb-3" id="accordionExample">
+      <div class="accordion-item">
+      <h2 class="accordion-header" id="headingOne">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#Hints_section" aria-expanded="false" aria-controls="Hints_section">
+          Hints...
+          </button>
+      </h2>
+      <div id="Hints_section" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+          <div class="accordion-body">
+              <p><span style="color:red">Hint 1</span>: Connect your phone and computer to the same network(connect to the same router via Wi-Fi or via ethernet cable).</p>
+              <p><span style="color:red">Hint 2</span>: Your phone can only send motion data to the game while the webpage is active. <strong>Keep your screen on at all time!</strong></p>
+              <p><span style="color:red">Hint 3</span>: <strong>Use 5GHz Wi-Fi</strong> for better gaming experience. If you are using 2.4GHz Wi-Fi, you know what I'm saying.</p>
+              <p><span style="color:red">Hint 4</span>: If you do not have a stable network(the lightsaber's motion is stuttery), try to enable Wi-Fi hotspot on your PC/Mac and connect your phone to the hotspot</p>
+              <p><span style="color:red">Hint 5</span>: The lightsaber's motion may lose sync with your phone's motion after some time. Recalibrate the lightsaber by tapping on the <strong>Recalibrate</strong> button or by refreshing the page on your phone, then tap on the <strong>Start</strong> button.</p>            
+              <p><span style="color:red">Hint 6</span>: Although it is not recommended, you can also use a wired connection for Mac and iPhone, see https://medium.com/@kennwuttisasiwat/macbook-personal-hotspot-to-your-iphone-ipad-or-ipod-via-iphone-usb-979e492a1314</p>     
+              <p><span style="color:red">Hint 7</span>: To design and upload your own maps, visit <strong>http://team-skyslackers.github.io</strong> using Safari/Chrome browser.  </p>          
+          </div>
+      </div>
+      </div>
+  </div>
 
 
     <!-- You can also require other files to run in this process -->

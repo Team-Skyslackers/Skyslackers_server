@@ -13,8 +13,8 @@ var ipcRenderer = require('electron').ipcRenderer;
 // request QR from main
 ipcRenderer.on('qr-request', function (event, store) {
     console.log("QR response received")
-    $("#QRcode1").html(store.split("***")[0]);
-    $("#QRcode2").html(store.split("***")[1]);
+    $("#QRcode1").html(store.split("***")[0].split('<path fill="#ffffff" d="M0 0h37v37H0z"/>').join(""));
+    $("#QRcode2").html(store.split("***")[1].split('<path fill="#ffffff" d="M0 0h37v37H0z"/>').join(""));
 })
 ipcRenderer.send('qr-request')
 
@@ -29,20 +29,20 @@ ipcRenderer.send('link-request')
 // when user move cursor to QR2
 function showQR2(){
     $("#QRcode1").addClass("d-none")
-    $("#URL1").addClass("d-none")
+    // $("#URL1").addClass("d-none")
     $("#1stPlayerQRCover").removeClass("d-none")
     $("#QRcode2").removeClass("d-none")
-    $("#URL2").removeClass("d-none")
+    // $("#URL2").removeClass("d-none")
     $("#2ndPlayerQRCover").addClass("d-none")
 }
 
 // when user move cursor away from QR2 
 function hideQR2(){
     $("#QRcode1").removeClass("d-none")
-    $("#URL1").removeClass("d-none")
+    // $("#URL1").removeClass("d-none")
     $("#1stPlayerQRCover").addClass("d-none")
     $("#QRcode2").addClass("d-none")
-    $("#URL2").addClass("d-none")
+    // $("#URL2").addClass("d-none")
     $("#2ndPlayerQRCover").removeClass("d-none")
 }
 
@@ -53,11 +53,17 @@ var controller2connected = false;
 ipcRenderer.on('controller1state', function (event,store) {
     if (store == "connected"){
         controller1connected = true;
-        $("#player1state").css('color', 'green')
+        $("#player1state").html('Player 1 (<strong>connected</strong>)')
+        $("#player1card").css('background-color', 'lightgreen')
         showAlert("success", "Player 1 is ready")
     }else if (store == "disconnected"){
         controller1connected = false;
-        $("#player1state").css('color', 'red')
+        $("#player1state").html('Player 1 (<strong>disconnected</strong>)')
+        $("#player1card").css('background-color', 'red')
+        setTimeout(() => {
+            $("#player1state").html('Player 1')
+            $("#player1card").css('background-color', 'white')
+        }, 3000);
         showAlert("error", "Player 1 is disconnected")
     }
     setStartGameButton(controller1connected || controller2connected);
@@ -66,15 +72,31 @@ ipcRenderer.on('controller1state', function (event,store) {
 ipcRenderer.on('controller2state', function (event,store) {
     if (store == "connected"){
         controller2connected = true;
-        $("#player2state").css('color', 'green')
+        $("#player2state").html('Player 2 (<strong>connected</strong>)')
+        $("#player2card").css('background-color', 'lightgreen')
         showAlert("success", "Player 2 is ready")
     }else if (store == "disconnected"){
         controller2connected = false;
-        $("#player2state").css('color', 'red')
+        $("#player2state").html('Player 2 (<strong>disconnected</strong>)')
+        $("#player2card").css('background-color', 'red')
+        setTimeout(() => {
+            $("#player2state").html('Player 2')
+            $("#player2card").css('background-color', 'white')
+        }, 3000);
         showAlert("error", "Player 2 is disconnected")
     }
     setStartGameButton(controller1connected || controller2connected);
 })
+
+function toggleMultiplayer(){
+    if($("#multiplayer-toggle-button").html() == "Multiplayer Mode"){
+        $("#multiplayer-toggle-button").html("Single Player Mode")
+        $("#player2card").removeClass("d-none")
+    }else{
+        $("#multiplayer-toggle-button").html("Multiplayer Mode")
+        $("#player2card").addClass("d-none")
+    }
+}
 
 function setStartGameButton(active){
     console.log(active)
