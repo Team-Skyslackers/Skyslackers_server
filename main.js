@@ -38,7 +38,7 @@ const certs = {
 };
 
 process.on('uncaughtException', (err) => {
-  console.log(dialog.showErrorBox("Network Resources Occupied", "Skyslacker might already be running\nPlease try to close all unnecessary application and try again"))
+  console.log(dialog.showErrorBox("Network Resources Occupied", err.message+"\nPlease try to close all other applications and try again"))
   process.exit();
 });
 
