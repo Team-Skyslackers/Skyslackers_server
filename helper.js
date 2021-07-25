@@ -318,7 +318,7 @@ function getLeaderboard(){
                         // add to recent uploads
                         var temp = "";
                         temp += '\
-                        <div class="card bg-gradient mb-3" id="'+songname.split(' ').join('_')+'-new-map-notification" style="background-color: LightSkyBlue">\
+                        <div class="card bg-gradient mb-3" id="'+songname.split(' ').join('_').split('(').join('-').split(')').join('-')+'-new-map-notification" style="background-color: LightSkyBlue">\
                             <div class="card-body row">\
                             <div class="col-8">\
                                <h4 class="card-title">New map!</h4>\
@@ -329,7 +329,7 @@ function getLeaderboard(){
                                 <button class="btn btn-outline-secondary"\
                                     style="width: 100%"\
                                     onclick="\
-                                        $(\'#'+songname.split(' ').join('_')+'-new-map-notification\').fadeOut(); \
+                                        $(\'#'+songname.split(' ').join('_').split('(').join('-').split(')').join('-')+'-new-map-notification\').fadeOut(); \
                                         dismissNewMapNotification(\''+songname+'\');\
                                     "\>\
                                     dismiss\
@@ -357,12 +357,12 @@ function getLeaderboard(){
                 historyList.sort((a, b) => parseInt(b.score) - parseInt(a.score));
                 
                 var newcard = '<div class="accordion-item">\
-                                    <h2 class="accordion-header" id="' + songname.split(' ').join('_') + 'heading">\
-                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse'+songname.split(' ').join('_')+'" aria-expanded="false" aria-controls="collapse'+songname.split(' ').join('_')+'">\
+                                    <h2 class="accordion-header" id="' + songname.split(' ').join('_').split('(').join('-').split(')').join('-') + 'heading">\
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse'+songname.split(' ').join('_').split('(').join('-').split(')').join('-')+'" aria-expanded="false" aria-controls="collapse'+songname.split(' ').join('_').split('(').join('-').split(')').join('-')+'">\
                                             <strong>'+songname+'</strong>\
                                         </button>\
                                     </h2>\
-                                    <div id="collapse'+songname.split(' ').join('_')+'" class="accordion-collapse collapse" aria-labelledby="' + songname.split(' ').join('_') + 'heading" data-bs-parent="#leaderboard-list">\
+                                    <div id="collapse'+songname.split(' ').join('_').split('(').join('-').split(')').join('-')+'" class="accordion-collapse collapse" aria-labelledby="' + songname.split(' ').join('_').split('(').join('-').split(')').join('-') + 'heading" data-bs-parent="#leaderboard-list">\
                                         <div class="accordion-body">';
 
                 // console.log(historyList);
@@ -401,7 +401,7 @@ function getLeaderboard(){
                     if (leaderboard_rank == 1){ // add gold star for No.1 user
                     newcard += '                    <h4 class="col-4 card-title">No.'+leaderboard_rank+'<span style="color:Gold">&#9733;</span></h4>'
                     newcard += '                    <h4 class="col-8 card-title ' + historyDetail.userID + '-username" style="color: Goldenrod; text-align: right">'+historyDetail.userID+'</h4>'
-                    $("#" + songname.split(' ').join('_') + '_' + historyDetail.userID + '_score').css("color", "Goldenrod")
+                    $("#" + songname.split(' ').join('_').split('(').join('-').split(')').join('-') + '_' + historyDetail.userID + '_score').css("color", "Goldenrod")
                     }else{
                     newcard += '                    <h4 class="col-4 card-title">No.'+leaderboard_rank+'</h4>'
                     newcard += '                    <h4 class="col-8 card-title ' + historyDetail.userID + '-username" style="text-align: right">'+historyDetail.userID+'</h4>'
@@ -487,10 +487,10 @@ function getMaps(Search = "", Difficulty = ""){
                                 <p class="card-text">By:\n'+username.val()+'</p>\
                             </div>\
                             <div class="col-4">\
-                                <a href="#' + songname.split(' ').join('_') + '_detail"\
+                                <a href="#' + songname.split(' ').join('_').split('(').join('-').split(')').join('-') + '_detail"\
                                  class="btn btn-outline-secondary collapsed" \
                                  data-bs-toggle="collapse" aria-expanded="false" \
-                                 aria-controls="' + songname.split(' ').join('_') + '_detail" \
+                                 aria-controls="' + songname.split(' ').join('_').split('(').join('-').split(')').join('-') + '_detail" \
                                  style="width: 100%;">\
                                  Detail\
                                  </a>\
@@ -505,7 +505,7 @@ function getMaps(Search = "", Difficulty = ""){
                 }
                 content += '\
                         </div>\
-                        <div class="collapse" id="' + songname.split(' ').join('_') + '_detail">\
+                        <div class="collapse" id="' + songname.split(' ').join('_').split('(').join('-').split(')').join('-') + '_detail">\
                             <hr>'
                 var creation_time = new Date(val.details.creationTime + 'Z');
                 creation_time = creation_time.toString().split(' ')
@@ -513,13 +513,13 @@ function getMaps(Search = "", Difficulty = ""){
                 content += '\
                             <h6>Creator: '+ username.val() +'</h6>\
                             <h6>Creation time: '+ creation_time +'</h6>\
-                            <h6 id="'+ songname.split(' ').join('_') +'_timesPlayed">Played: many times</h6>\
-                            <div id="'+songname.split(' ').join('_')+'_highest_score" style="margin: 0px"></div>\
+                            <h6 id="'+ songname.split(' ').join('_').split('(').join('-').split(')').join('-') +'_timesPlayed">Played: many times</h6>\
+                            <div id="'+songname.split(' ').join('_').split('(').join('-').split(')').join('-')+'_highest_score" style="margin: 0px"></div>\
                             <hr>\
                             <h4>Comments</h4>\
-                            <div class="overflow-auto mb-3" style="padding: 0px; max-height: 50vh" id="'+songname.split(' ').join('_')+'-commentSection">Comments</div>\
+                            <div class="overflow-auto mb-3" style="padding: 0px; max-height: 50vh" id="'+songname.split(' ').join('_').split('(').join('-').split(')').join('-')+'-commentSection">Comments</div>\
                                 <div class="input-group mb-3">\
-                                    <input type="text" class="form-control" placeholder="New comment..." id="'+songname.split(' ').join('_')+'-commentinput">\
+                                    <input type="text" class="form-control" placeholder="New comment..." id="'+songname.split(' ').join('_').split('(').join('-').split(')').join('-')+'-commentinput">\
                                     <button class="btn btn-secondary" onclick="postComment(\''+songname+'\')">Post comment</button>\
                                 </div>\
                             </div>\
@@ -532,27 +532,27 @@ function getMaps(Search = "", Difficulty = ""){
                 DB.ref("game_history").orderByChild("musicID").equalTo(songname).get().then(history =>{
                     if (history.exists()){
                         var times_played = Object.keys(history.val()).length;
-                        if (times_played == 1) $("#"+songname.split(' ').join('_')+"_timesPlayed").text("Played: 1 time")
-                        else $("#"+songname.split(' ').join('_')+"_timesPlayed").text("Played: "+times_played+" times")
+                        if (times_played == 1) $("#"+songname.split(' ').join('_').split('(').join('-').split(')').join('-')+"_timesPlayed").text("Played: 1 time")
+                        else $("#"+songname.split(' ').join('_').split('(').join('-').split(')').join('-')+"_timesPlayed").text("Played: "+times_played+" times")
                         
                         
                         // sort history list
                         var historyList = Object.values(history.val());
                         historyList.sort((a, b) => parseInt(b.score) - parseInt(a.score));
                         DB.ref("users").child(historyList[0].userID).get().then(user => {
-                            $("#"+songname.split(' ').join('_')+"_highest_score").html('\
+                            $("#"+songname.split(' ').join('_').split('(').join('-').split(')').join('-')+"_highest_score").html('\
                             <h6>Highest score: <span style="color: DarkBlue">'+historyList[0].score+'</span> by <span style="color: DarkBlue">'+user.val().username+'</span></h6>\
                             ')
                         })
                     }else{
-                        $("#"+songname.split(' ').join('_')+"_timesPlayed").text("Has not been played yet")
+                        $("#"+songname.split(' ').join('_').split('(').join('-').split(')').join('-')+"_timesPlayed").text("Has not been played yet")
                     }
                 })
 
                 // update comment section
                 DB.ref('songs/' + songname + "/comments").on('value', comments =>{
                     var allUIDdisplayed = []; // for updating UID with username
-                    var commentSection = $("#" + songname.split(' ').join('_') + "-commentSection");
+                    var commentSection = $("#" + songname.split(' ').join('_').split('(').join('-').split(')').join('-') + "-commentSection");
                     
                     // empty comment section before each refresh
                     commentSection.html("");
@@ -638,7 +638,7 @@ function getHistoryList(){
                         <div class="card-body">\
                         <div class="row">\
                             <h4 class="card-title col-6">'+history.musicID+'</h4>\
-                            <h5 class="card-text col-6" style="text-align: right"><strong>Score: <span id="'+history.musicID.split(' ').join('_')+'_' + history.userID + '_score">'+history.score+'</span></strong></h5>\
+                            <h5 class="card-text col-6" style="text-align: right"><strong>Score: <span id="'+history.musicID.split(' ').join('_').split('(').join('-').split(')').join('-')+'_' + history.userID + '_score">'+history.score+'</span></strong></h5>\
                         </div>\
                         <p class="card-text">\
                             Perfect: '+history.spec.perfect+' Good: '+history.spec.good+' Miss: ' + history.spec.missed +'\
@@ -665,7 +665,7 @@ function getHistoryList(){
 }
 
 function postComment(musicID){
-    var comment = $("#"+musicID.split(' ').join('_')+"-commentinput").val();
+    var comment = $("#"+musicID.split(' ').join('_').split('(').join('-').split(')').join('-')+"-commentinput").val();
     if (comment == '') return
     DB.ref("songs/" + musicID + "/comments").push({
         dateAndTimeUTC: getUTCDateAndTime(),
@@ -673,7 +673,7 @@ function postComment(musicID){
         userID: currentUser.uid
     });
     alert("comment posted!")
-    $("#"+musicID.split(' ').join('_')+"-commentinput").val("");
+    $("#"+musicID.split(' ').join('_').split('(').join('-').split(')').join('-')+"-commentinput").val("");
 }
 
 function authState(state){
@@ -860,11 +860,19 @@ function newScore(Uid, MusicID, Score, Perfect, Good, Missed, DateAndTime){
 
 // for test only
 // function testFunction(){
-//     DB.ref('songs/song1').set({
-//         "difficulty": "mid",
-//         "details": {
-//             "author": "pp0r2amgbrfwcmnggM0SBatITRP2",
-//             "creationTime": "2021-07-12T16:21:07"
-//         }
+//     DB.ref('game_history').orderByChild('musicID').equalTo('test3').get().then(snapshot => {
+//         snapshot.forEach(function(data){
+//             // DB.ref('game_history').child(data.key).remove()
+//             DB.ref('game_history').child(data.key).get().then(abaaba => {
+//                 console.log(abaaba.val().musicID)
+//             })
+//         })
 //     })
+//     // DB.ref('songs/THE FORCE').set({
+//     //     "difficulty": "normal",
+//     //     "details": {
+//     //         "author": "pp0r2amgbrfwcmnggM0SBatITRP2",
+//     //         "creationTime": "2021-07-12T16:21:07"
+//     //     }
+//     // })
 // }
