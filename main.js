@@ -196,6 +196,7 @@ wsUnityServer2.on('connection', function connection(ws_Unity) {
 function createWindow () {
   // Create the browser window.
   mainWindow = new BrowserWindow({
+    autoHideMenuBar: true,
     width: 850,
     height: 800,
     webPreferences: {
