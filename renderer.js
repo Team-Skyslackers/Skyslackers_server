@@ -125,18 +125,17 @@ function showAlert(type, info){
 }
 
 function opengame(){
-
-    const script = 'tell application "skyslackers_build" to activate';
-    applescript.execString(script);
-
-    // var exec = require('child_process').execFile;
-    // var fun =function(){
-    //     console.log("opening the game");
-    //     exec('skyslackers_build.exe', function(err, data) {  
-    //         // console.log(err)
-    //         // console.log(data.toString());                       
-    //     });  
-    // }
-    // fun();
-
+    if (process.platform == 'darwin'){
+        const script = 'tell application "skyslackers_build" to activate';
+        applescript.execString(script);
+    }else if (process.platform == 'win32'){
+        var exec = require('child_process').execFile;
+        console.log("opening the game");
+        exec('game_resources/skyslackers_build.exe', function(err, data) {  
+            // console.log(err)
+            // console.log(data.toString());                       
+        });
+    }else{
+        console.log(dialog.showErrorBox("You are using "+process.platform, "Only MacOS and Windows are currently supported"))
+    }
 }
