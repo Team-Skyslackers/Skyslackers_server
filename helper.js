@@ -574,7 +574,7 @@ function getMaps(Search = "", Difficulty = ""){
                         var temp_commentCard = '';
                         
                         //highlight comment if comment belongs to the user
-                        if (comment.userID = currentUser.uid){
+                        if (comment.userID == currentUser.uid){
                             temp_commentCard += '            <div class="card bg-gradient card-body mb-3" style="background-color: AliceBlue">'
                         }else{
                             temp_commentCard += '            <div class="card bg-light bg-gradient card-body mb-3">'
@@ -594,8 +594,8 @@ function getMaps(Search = "", Difficulty = ""){
 
                     // replace UID with username
                     for (const UID in allUIDdisplayed){
-                        DB.ref('users/' + allUIDdisplayed[UID] + '/username').get().then(username => {
-                            $("." + allUIDdisplayed[UID] + "-username").text(username.val());
+                        DB.ref('users/' + allUIDdisplayed[UID] + '/username').get().then(commentor => {
+                            $("." + allUIDdisplayed[UID] + "-username").text(commentor.val());
                         })
                     }
 
