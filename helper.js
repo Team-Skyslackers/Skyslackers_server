@@ -156,7 +156,7 @@ function SignOut(){
 
 // Send reset password email
 function ResetPasswordViaEmail(){
-    firebase.auth().sendPasswordResetEmail(email)
+    firebase.auth().sendPasswordResetEmail(currentUser.email)
         .then(() => {
             alert("Password reset email sent!\nPlease check your inbox.");
             // Password reset email sent!
