@@ -56,15 +56,19 @@ ipcRenderer.on('controller1state', function (event,store) {
         controller1connected = true;
         $("#player1state").html('Player 1 (<strong>connected</strong>)')
         $("#player1card").css('background-color', 'lightgreen')
+        $("#player1card").css('color', 'black')
+        $("#QRcode1").css("filter", "invert(0%)")
         showAlert("success", "Player 1 is ready")
     }else if (store == "disconnected"){
         controller1connected = false;
         $("#player1state").html('Player 1 (<strong>disconnected</strong>)')
         $("#player1card").css('background-color', 'red')
-        setTimeout(() => {
-            $("#player1state").html('Player 1')
-            $("#player1card").css('background-color', 'white')
-        }, 3000);
+        $("#player1card").css('color', 'white')
+        $("#QRcode1").css("filter", "invert(100%)")
+        // setTimeout(() => {
+        //     $("#player1state").html('Player 1')
+        //     $("#player1card").css('background-color', 'white')
+        // }, 5000);
         showAlert("error", "Player 1 is disconnected")
     }
     setStartGameButton(multiplayer_mode? controller1connected && controller2connected: controller1connected || controller2connected);
@@ -75,15 +79,19 @@ ipcRenderer.on('controller2state', function (event,store) {
         controller2connected = true;
         $("#player2state").html('Player 2 (<strong>connected</strong>)')
         $("#player2card").css('background-color', 'lightgreen')
+        $("#player2card").css('color', 'black')
+        $("#QRcode2").css("filter", "invert(0%)")
         showAlert("success", "Player 2 is ready")
     }else if (store == "disconnected"){
         controller2connected = false;
         $("#player2state").html('Player 2 (<strong>disconnected</strong>)')
         $("#player2card").css('background-color', 'red')
-        setTimeout(() => {
-            $("#player2state").html('Player 2')
-            $("#player2card").css('background-color', 'white')
-        }, 3000);
+        $("#player2card").css('color', 'white')
+        $("#QRcode2").css("filter", "invert(100%)")
+        // setTimeout(() => {
+        //     $("#player2state").html('Player 2')
+        //     $("#player2card").css('background-color', 'white')
+        // }, 5000);
         showAlert("error", "Player 2 is disconnected")
     }
     setStartGameButton(multiplayer_mode? controller1connected && controller2connected: controller1connected || controller2connected);

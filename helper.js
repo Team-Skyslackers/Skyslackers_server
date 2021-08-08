@@ -56,6 +56,10 @@ function RegisterUser(username, email, password, confirmPassword){
         alert("Confirm password does not match.");
         return
     }
+    if (password.length < 8){
+        alert("Password too short")
+        return
+    }
     if (username.length<3 || username.includes('@') || username.includes(' ')){
         alert("Invalid username.");
         return

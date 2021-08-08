@@ -28,7 +28,7 @@
     "tutorial",
     "demo"
   ],
-  "author": "GitHub",
+  "author": "Yue Junfeng, Zhang Haoyu",
   "license": "CC0-1.0",
   "devDependencies": {
     "electron": "^13.1.7",
