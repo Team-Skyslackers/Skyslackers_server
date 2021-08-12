@@ -139,7 +139,7 @@ function opengame(){
     }else if (process.platform == 'win32'){
         var exec = require('child_process').execFile;
         console.log("opening the game");
-        exec('game_resources/skyslackers_build.exe', function(err, data) {  
+        exec('game_resources/Skyslackers.exe', function(err, data) {  
             // console.log(err)
             // console.log(data.toString());                       
         });

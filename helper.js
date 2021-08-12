@@ -175,7 +175,10 @@ function ResetPasswordViaEmail(email){
 }
 
 // Set user profile
-function ProfileSave(newUsername, newPassword, confirmNewPassword){
+function ProfileSave(newUsername, newPassword, confirmNewPassword, IsPublic){
+    // update whether history is public
+    DB.ref('users/'+currentUser.uid + '/isPublic').set(IsPublic)
+
     // check format
     if (newUsername.length < 3 || newUsername.includes('@') || newUsername.includes(' ')){
         alert("Invalid username")
@@ -268,6 +271,16 @@ firebase.auth().onAuthStateChanged((user) => {
 
         // get notification for new maps, get leaderboard
         getLeaderboard();
+
+        // check if history is public
+        DB.ref('users/'+user.uid + '/isPublic').get().then(snapshot => {
+            if (!snapshot.exists() || snapshot.val() == true){
+                console.log(snapshot.val())
+                $("#profile-publicprofile").prop('checked', true);
+            }else{
+                $("#profile-publicprofile").prop('checked', false);
+            }
+        })
 
         $(".auth").addClass("d-none");
         $("#signout-form").removeClass("d-none");
@@ -619,7 +632,6 @@ function getHistoryList(){
     $("#game-history").html(""); // clean up histories
 
     DB.ref('users').get().then(users => {
-        friendUIDtoUsername = {}
         if (!Object.keys(users.val()[currentUser.uid]).includes("friends")) var userAndFriendsID = [currentUser.uid]
         else {
             var userAndFriendsID = Object.keys(users.val()[currentUser.uid].friends)
@@ -750,7 +762,7 @@ function getFriendsList(){
         $("#listOfFriends").html('\
             <div class="input-group mb-3" id="friend-search">\
                 <input type="text" class="form-control" placeholder="Your friend\'s username" aria-label="Username" id="friend-username-input">\
-                <button class="btn btn-outline-primary" type="button" onclick="newFriend($(\'#friend-username-input\').val())">Add friend</button>\
+                <button class="btn btn-outline-primary" type="button" onclick="newFriend($(\'#friend-username-input\').val())">Subscribe</button>\
             </div>');
         if (!user.exists() || !Object.keys(user.val()).includes("friends")) {
             $("#listOfFriends").append("No friends yet. Add some friends now!")
@@ -804,12 +816,19 @@ function newFriend(friend_username){
             if(friend.exists()){
                 alert("You have previously added "+friend_username+" as your friend.")
             }else{
-                DB.ref('users/'+currentUser.uid+'/friends/'+friend_uid).set({
-                    friend_time: getUTCDateAndTime()
+                // check if the user is private account
+                DB.ref('users/'+friend_uid + '/isPublic').get().then(snapshot => {
+                    if (!snapshot.exists() || snapshot.val() == true){
+                        DB.ref('users/'+currentUser.uid+'/friends/'+friend_uid).set({
+                            friend_time: getUTCDateAndTime()
+                        })
+        
+                        // refresh friends list
+                        getFriendsList()
+                    }else{
+                        alert("Failed to subscribe because the account is private")
+                    }
                 })
-
-                // refresh friends list
-                getFriendsList()
             }
         })
     })
