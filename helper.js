@@ -175,9 +175,9 @@ function ResetPasswordViaEmail(email){
 }
 
 // Set user profile
-function ProfileSave(newUsername, newPassword, confirmNewPassword, IsPublic){
+function ProfileSave(newUsername, newPassword, confirmNewPassword, IsPrivate){
     // update whether history is public
-    DB.ref('users/'+currentUser.uid + '/isPublic').set(IsPublic)
+    DB.ref('users/'+currentUser.uid + '/isPrivate').set(IsPrivate)
 
     // check format
     if (newUsername.length < 3 || newUsername.includes('@') || newUsername.includes(' ')){
@@ -273,12 +273,12 @@ firebase.auth().onAuthStateChanged((user) => {
         getLeaderboard();
 
         // check if history is public
-        DB.ref('users/'+user.uid + '/isPublic').get().then(snapshot => {
-            if (!snapshot.exists() || snapshot.val() == true){
+        DB.ref('users/'+user.uid + '/isPrivate').get().then(snapshot => {
+            if (!snapshot.exists() || snapshot.val() == false){
                 console.log(snapshot.val())
-                $("#profile-publicprofile").prop('checked', true);
+                $("#profile-privateprofile").prop('checked', false);
             }else{
-                $("#profile-publicprofile").prop('checked', false);
+                $("#profile-privateprofile").prop('checked', true);
             }
         })
 
@@ -317,6 +317,17 @@ firebase.auth().onAuthStateChanged((user) => {
         console.log("No user signed in")
     }
 });
+
+function privateToggleCheck(){
+    if ($('#profile-privateprofile').is(':checked')) {
+        $("#public-acc-alert").addClass('d-none')
+        $("#private-acc-alert").removeClass('d-none')
+    }
+    else {
+        $("#public-acc-alert").removeClass('d-none')
+        $("#private-acc-alert").addClass('d-none')
+    }
+}
 
 function getLeaderboard(){
     DB.ref("songs").get().then((snapshot) => {
@@ -817,8 +828,8 @@ function newFriend(friend_username){
                 alert("You have previously added "+friend_username+" as your friend.")
             }else{
                 // check if the user is private account
-                DB.ref('users/'+friend_uid + '/isPublic').get().then(snapshot => {
-                    if (!snapshot.exists() || snapshot.val() == true){
+                DB.ref('users/'+friend_uid + '/isPrivate').get().then(snapshot => {
+                    if (!snapshot.exists() || snapshot.val() == false){
                         DB.ref('users/'+currentUser.uid+'/friends/'+friend_uid).set({
                             friend_time: getUTCDateAndTime()
                         })

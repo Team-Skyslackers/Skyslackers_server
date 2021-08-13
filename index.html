@@ -305,15 +305,19 @@
                     <label for="profile-confirmpassword" class="form-label">Confirm password</label>
                     <input type="password" class="form-control" id="profile-confirmpassword">
                 </div>
-                <div class="mb-3" style="display: flex; flex-direction: row; align-items: center; gap: 36px">
-                    <label for="profile-publicprofile" class="form-label">Private account</label>
-                    <div class="form-check form-switch">
-                        <input id="profile-publicprofile" class="form-check-input" type="checkbox" id="flexSwitchCheckChecked" checked>
+                <div class="mb-3" style="text-align: right;">
+                    <div style="display: flex; flex-direction: row; align-items: center;">
+                        <label for="profile-privateprofile" class="form-label">Private account</label>
+                        <div class="form-check form-switch" style="margin-left: auto;">
+                            <input id="profile-privateprofile" class="form-check-input" type="checkbox" id="flexSwitchCheckChecked" checked onclick="privateToggleCheck()">
+                        </div>
                     </div>
+                    <small id="public-acc-alert" class="d-none text-muted">Other users can subscribe to you.</small>
+                    <small id="private-acc-alert" class="d-none text-muted">Other users will not be able to subscribe to you.</small>
                 </div>
                 <div class="d-grid gap-2">
                     <button type="button" id="profile-save" class="btn btn-primary" 
-                        onclick="ProfileSave($('#profile-username').val(), $('#profile-newpassword').val(), $('#profile-confirmpassword').val(), $('#profile-publicprofile').is(':checked'))">
+                        onclick="ProfileSave($('#profile-username').val(), $('#profile-newpassword').val(), $('#profile-confirmpassword').val(), $('#profile-privateprofile').is(':checked'))">
                         Save profile
                     </button>
                     <!-- <button type="button" id="profile-resetPasswordViaEmail" class="btn btn-warning" 
