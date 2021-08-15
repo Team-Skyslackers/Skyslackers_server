@@ -195,17 +195,30 @@ wsUnityServer2.on('connection', function connection(ws_Unity) {
 
 function createWindow () {
   // Create the browser window.
-  mainWindow = new BrowserWindow({
-    autoHideMenuBar: true,
-    width: 850,
-    height: 800,
-    webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
-      // preload: path.join(__dirname, 'preload.js')
-      
-    }
-  })
+  console.log(process.platform);
+  if (process.platform == 'darwin'){
+    // for windows
+    mainWindow = new BrowserWindow({
+      autoHideMenuBar: true,
+      width: 850,
+      height: 800,
+      webPreferences: {
+        nodeIntegration: true,
+        contextIsolation: false,
+      }
+    })
+  } else {
+    mainWindow = new BrowserWindow({
+      autoHideMenuBar: true,
+      width: 850,
+      height: 800,
+      icon: 'resources\\app\\icon.ico',
+      webPreferences: {
+        nodeIntegration: true,
+        contextIsolation: false,
+      }
+    })
+  }
   // mainWindow.webContents.openDevTools()
 
   // and load the index.html of the app.
