@@ -539,7 +539,6 @@ function getMaps(Search = "", Difficulty = ""){
                 creation_time = creation_time.toString().split(' ')
                 creation_time = creation_time[2] + ' ' + creation_time[1] + ' ' + creation_time[3] + ' ' + creation_time[4];
                 content += '\
-                            <h6>Creator: '+ username.val() +'</h6>\
                             <h6>Creation time: '+ creation_time +'</h6>\
                             <h6 id="'+ songname.split(' ').join('_').split('(').join('-').split(')').join('-') +'_timesPlayed">Played: many times</h6>\
                             <div id="'+songname.split(' ').join('_').split('(').join('-').split(')').join('-')+'_highest_score" style="margin: 0px"></div>\
